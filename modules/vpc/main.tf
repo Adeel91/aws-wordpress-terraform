@@ -1,10 +1,10 @@
 # Creating VPC
-resource "aws_vpc" "wordpress-vpc" {
+resource "aws_vpc" "this" {
   cidr_block            = var.vpc_cidr
-  enable_dns_support    = true
-  enable_dns_hostnames  = true
+  enable_dns_support    = var.enable_dns_support
+  enable_dns_hostnames  = var.enable_dns_hostnames
 
   tags = {
-    Name = var.wordpress_vpc_name
+    Name = var.vpc_name
   }
 }

@@ -7,6 +7,8 @@ terraform {
   }
 }
 
+# Passing project specific details for VPC
 module "vpc" {
-  source = "./modules/vpc"
+  source      = "./modules/vpc"
+  vpc_name    = "wordpress-vpc"
 }
