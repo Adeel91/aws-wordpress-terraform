@@ -1,4 +1,10 @@
 # Create variables for VPC
+variable "wordpress_vpc_name" {
+  description = "VPC name prefix"
+  type        = string
+  default     = "wordpress-vpc"
+}
+
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"
   type        = string
