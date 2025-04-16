@@ -1,12 +1,14 @@
 variable "vpc_name" {
   description = "Defaut VPC name"
   type        = string
+  default = ""
 }
 
 # Public Subnet Settings
 variable "public_subnet_name" {
   description = "Name tag for the subnet"
   type        = string
+  default = ""
 }
 
 variable "public_cidr_block" {
