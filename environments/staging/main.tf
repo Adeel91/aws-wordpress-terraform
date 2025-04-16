@@ -1,7 +1,7 @@
 # Passing project specific details for VPC
 module "vpc" {
   source            = "../../modules/vpc"
-  vpc_name          = var.vpc_name
+  vpc_name          = var.staging_vpc_name
 }
 
 # # Create a Public Subnet
