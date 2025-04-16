@@ -6,3 +6,10 @@ terraform {
     }
   }
 }
+
+# Calling the environment module based 
+module "environment" {
+  # @todo: change this to dynamically selecting environment
+  # based on the terraform workspace selected.
+  source = "./environments/staging"
+}
