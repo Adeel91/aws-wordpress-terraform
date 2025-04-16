@@ -14,15 +14,18 @@ variable "public_subnet_name" {
 variable "public_cidr_block" {
   description = "Public CIDR block"
   type        = string
+  default = ""
 }
 
 # Private Subnet Settings
 variable "private_subnet_name" {
   description = "Defaut VPC name"
   type        = string
+  default = ""
 }
 
 variable "private_cidr_block" {
   description = "Private CIDR block"
   type        = string
+  default = ""
 }
