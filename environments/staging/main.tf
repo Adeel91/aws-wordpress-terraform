@@ -4,18 +4,18 @@ module "vpc" {
   vpc_name          = var.vpc_name
 }
 
-# # Create a Public Subnet
-# module "public_subnet" {
-#   source            = "../../modules/subnet"
-#   vpc_id            = module.vpc.vpc_id
-#   subnet_cidr       = var.public_cidr_block
-#   subnet_name       = var.public_subnet_name
-# }
+# Create a Public Subnet
+module "public_subnet" {
+  source            = "../../modules/subnet"
+  vpc_id            = module.vpc.vpc_id
+  subnet_cidr       = var.public_cidr_block
+  subnet_name       = var.public_subnet_name
+}
 
-# # Create a Private Subnet
-# module "private_subnet" {
-#   source            = "../../modules/subnet"
-#   vpc_id            = module.vpc.vpc_id
-#   subnet_cidr       = var.private_cidr_block
-#   subnet_name       = var.private_subnet_name
-# }
+# Create a Private Subnet
+module "private_subnet" {
+  source            = "../../modules/subnet"
+  vpc_id            = module.vpc.vpc_id
+  subnet_cidr       = var.private_cidr_block
+  subnet_name       = var.private_subnet_name
+}
