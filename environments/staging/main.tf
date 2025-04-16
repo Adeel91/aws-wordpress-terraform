@@ -10,6 +10,7 @@ module "public_subnet" {
   vpc_id            = module.vpc.vpc_id
   subnet_cidr       = var.public_cidr_block
   subnet_name       = var.public_subnet_name
+  depends_on        = [ module.vpc ]
 }
 
 # Create a Private Subnet
@@ -18,4 +19,5 @@ module "private_subnet" {
   vpc_id            = module.vpc.vpc_id
   subnet_cidr       = var.private_cidr_block
   subnet_name       = var.private_subnet_name
+  depends_on        = [ module.vpc ]
 }
