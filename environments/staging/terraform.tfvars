@@ -1,4 +1,4 @@
-staging_vpc_name = "wordpress-vpc"
+# staging_vpc_name = "wordpress-vpc"
 # public_subnet_name = "public-subnet"
 # public_cidr_block = "10.0.1.0/24"
 # private_subnet_name = "private-subnet"
