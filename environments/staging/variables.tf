@@ -1,8 +1,8 @@
-variable "staging_vpc_name" {
-  description = "Defaut VPC name"
-  type        = string
-  default     = ""
-}
+# variable "staging_vpc_name" {
+#   description = "Defaut VPC name"
+#   type        = string
+#   default     = ""
+# }
 
 # # Public Subnet Settings
 # variable "public_subnet_name" {
