@@ -27,8 +27,8 @@ module "private_subnet" {
 }
 
 # Create Internet Gateway
-module "internet_gateway" {
-  source     = "../../modules/igw"
-  vpc_id     = module.vpc.vpc_id
-  vpc_name   = var.vpc_name
+module "igw" {
+  source            = "../../modules/igw"
+  vpc_id            = module.vpc.vpc_id
+  project_name      = var.project_name
 }
