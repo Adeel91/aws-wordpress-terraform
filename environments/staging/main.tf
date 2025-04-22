@@ -40,7 +40,7 @@ module "public_rtb" {
   source              = "../../modules/rtb"
   vpc_id              = module.vpc.vpc_id
   project_name        = var.project_name
-  subnet_ids          = values(module.public_subnet.subnets)
+  subnet_ids          = module.public_subnet.subnets
   is_public           = true
   igw_id              = module.igw.igw_id
   depends_on          = [module.igw]
@@ -51,6 +51,6 @@ module "private_rtb" {
   source       = "../../modules/rtb"
   vpc_id       = module.vpc.vpc_id
   project_name = var.project_name
-  subnet_ids   = values(module.private_subnet.subnets)
+  subnet_ids   = module.private_subnet.subnets
   is_public    = false
 }
