@@ -16,7 +16,7 @@ variable "subnet_cidr" {
 
 variable "azs" {
   description = "Availability zone for the subnet"
-  type        = string
+  type        = list(string)
 }
 
 variable "is_public" {
