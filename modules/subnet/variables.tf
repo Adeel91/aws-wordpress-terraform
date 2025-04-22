@@ -4,20 +4,22 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "subnet_cidr" {
-  description = "CIDR block for the subnet"
-  type        = string
-  default     = "10.0.1.0/24"
-}
-
-variable "availability_zone" {
-  description = "Availability zone for the subnet"
-  type        = string
-  default     = "us-west-2a"
-}
-
 variable "subnet_name" {
   description = "Name tag for the subnet"
   type        = string
-  default     = "public-subnet"
+}
+
+variable "subnet_cidr" {
+  description = "CIDR block for the subnet"
+  type        = string
+}
+
+variable "azs" {
+  description = "Availability zone for the subnet"
+  type        = string
+}
+
+variable "is_public" {
+  description = "Whether the subnet is public or private"
+  type        = bool
 }

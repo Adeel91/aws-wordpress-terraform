@@ -1,4 +1,4 @@
-output "subnet_id" {
-  description = "The ID of the subnet"
-  value       = aws_subnet.this.id
+output "subnet_ids" {
+  description = "The IDs of the newly created subnets"
+  value       = aws_subnet.this[*].id
 }
