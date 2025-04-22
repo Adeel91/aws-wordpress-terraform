@@ -1,9 +1,26 @@
 variable "vpc_id" {
-  description = "VPC ID where the Internet Gateway will be attached"
+  description = "ID of the VPC"
   type        = string
 }
 
 variable "project_name" {
-  description = "Name of the project"
+  description = "Project name prefix"
   type        = string
+}
+
+variable "subnet_ids" {
+  description = "List of Subnet IDs to associate with the route table"
+  type        = list(string)
+  default     = []
+}
+
+variable "is_public" {
+  description = "Whether this is a public route table"
+  type        = bool
+}
+
+variable "internet_gateway_id" {
+  description = "Internet Gateway ID for public route table"
+  type        = string
+  default     = null
 }
