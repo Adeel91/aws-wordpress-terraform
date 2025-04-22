@@ -10,8 +10,7 @@ variable "project_name" {
 
 variable "subnet_ids" {
   description = "List of Subnet IDs to associate with the route table"
-  type        = list(string)
-  default     = []
+  type        = map(string)
 }
 
 variable "is_public" {
