@@ -34,3 +34,23 @@ module "igw" {
   vpc_id            = module.vpc.vpc_id
   project_name      = var.project_name
 }
+
+# Public Route Table
+module "public_rtb" {
+  source              = "../../modules/rtb"
+  vpc_id              = module.vpc.vpc_id
+  project_name        = var.project_name
+  subnet_ids          = module.public_subnet.subnet_ids
+  is_public           = true
+  internet_gateway_id = module.igw.igw_id
+  depends_on          = [module.igw]
+}
+
+# Private Route Table
+module "private_rtb" {
+  source       = "../../modules/rtb"
+  vpc_id       = module.vpc.vpc_id
+  project_name = var.project_name
+  subnet_ids   = module.private_subnet.subnet_ids
+  is_public    = false
+}
