@@ -11,12 +11,6 @@ variable "public_subnet_name" {
   default       = "public-subnet"
 }
 
-variable "public_cidr_block" {
-  description   = "Public CIDR block"
-  type          = string
-  default       = "10.0.1.0/24"
-}
-
 # Private Subnet Settings
 variable "private_subnet_name" {
   description   = "Defaut VPC name"
@@ -24,14 +18,14 @@ variable "private_subnet_name" {
   default       = "private-subnet"
 }
 
-variable "private_cidr_block" {
-  description   = "Private CIDR block"
-  type          = string
-  default       = "10.0.2.0/24"
-}
-
 variable "azs" {
   description = "Availability zones in which to create subnets"
   type        = list(string)
   default     = ["us-west-2a", "us-west-2b"]
+}
+
+variable "project_name" {
+  description = "Project name"
+  type        = string
+  default     = "wordpress"
 }

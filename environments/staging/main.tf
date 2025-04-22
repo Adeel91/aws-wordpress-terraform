@@ -8,7 +8,7 @@ module "vpc" {
 module "public_subnet" {
   source            = "../../modules/subnet"
   vpc_id            = module.vpc.vpc_id
-  subnet_cidr       = var.public_cidr_block
+  project_name      = var.project_name
   subnet_name       = var.public_subnet_name
   azs               = var.azs
   is_public         = true
@@ -19,9 +19,16 @@ module "public_subnet" {
 module "private_subnet" {
   source            = "../../modules/subnet"
   vpc_id            = module.vpc.vpc_id
-  subnet_cidr       = var.private_cidr_block
+  project_name      = var.project_name
   subnet_name       = var.private_subnet_name
   azs               = var.azs
   is_public         = false
   depends_on        = [module.vpc]
+}
+
+# Create Internet Gateway
+module "internet_gateway" {
+  source     = "../../modules/igw"
+  vpc_id     = module.vpc.vpc_id
+  vpc_name   = var.vpc_name
 }

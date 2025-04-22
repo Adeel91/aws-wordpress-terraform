@@ -1,12 +1,12 @@
 # Creating Subnet
 resource "aws_subnet" "this" {
-  count                   = length(var.azs)
+  count                   = length(var.subnet_cidr_blocks)
   vpc_id                  = var.vpc_id
-  cidr_block              = cidrsubnet(var.subnet_cidr, 8, count.index)  # dnamically calculate cidr block
+  cidr_block              = element(var.subnet_cidr_blocks, count.index)
   availability_zone       = element(var.azs, count.index)  # assign to specific AZ
   map_public_ip_on_launch = var.is_public
 
   tags = {
-    Name = "${var.subnet_name}-${element(var.azs, count.index)}"
+    Name = "${var.project_name}-${var.is_public ? "public" : "private"}-subnet${count.index + 1}"
   }
 }
