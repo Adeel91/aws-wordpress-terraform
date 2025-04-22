@@ -32,6 +32,6 @@ variable "private_cidr_block" {
 
 variable "azs" {
   description = "Availability zones in which to create subnets"
-  type        = string
+  type        = list(string)
   default     = ["us-west-2a", "us-west-2b"]
 }
