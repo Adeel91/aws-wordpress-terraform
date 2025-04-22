@@ -19,7 +19,7 @@ variable "is_public" {
   type        = bool
 }
 
-variable "internet_gateway_id" {
+variable "igw_id" {
   description = "Internet Gateway ID for public route table"
   type        = string
   default     = null

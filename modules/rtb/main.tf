@@ -11,7 +11,7 @@ resource "aws_route" "default_route" {
   count                  = var.is_public ? 1 : 0
   route_table_id         = aws_route_table.this.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = var.internet_gateway_id
+  gateway_id             = var.igw_id
 }
 
 # Associate subnets with the route table
