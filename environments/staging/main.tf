@@ -42,7 +42,7 @@ module "public_rtb" {
   project_name        = var.project_name
   subnet_ids          = module.public_subnet.subnet_ids
   is_public           = true
-  internet_gateway_id = module.igw.igw_id
+  igw_id              = module.igw.igw_id
   depends_on          = [module.igw]
 }
 
