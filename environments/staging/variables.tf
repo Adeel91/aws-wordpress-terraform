@@ -27,5 +27,9 @@ variable "azs" {
 variable "project_name" {
   description = "Project name"
   type        = string
-  default     = "wordpress"
+}
+
+variable "subnet_cidr_blocks" {
+  description = "CIDR blocks for subnets"
+  type        = list(string)
 }

@@ -10,6 +10,7 @@ module "public_subnet" {
   vpc_id            = module.vpc.vpc_id
   project_name      = var.project_name
   subnet_name       = var.public_subnet_name
+  subnet_cidr_blocks= ["10.0.0.0/24", "10.0.2.0/24"]
   azs               = var.azs
   is_public         = true
   depends_on        = [module.vpc]
@@ -21,6 +22,7 @@ module "private_subnet" {
   vpc_id            = module.vpc.vpc_id
   project_name      = var.project_name
   subnet_name       = var.private_subnet_name
+  subnet_cidr_blocks= ["10.0.1.0/24", "10.0.3.0/24"]
   azs               = var.azs
   is_public         = false
   depends_on        = [module.vpc]
