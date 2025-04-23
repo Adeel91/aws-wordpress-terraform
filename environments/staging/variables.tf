@@ -19,18 +19,18 @@ variable "private_subnet_name" {
 }
 
 variable "azs" {
-  description = "Availability zones in which to create subnets"
-  type        = list(string)
-  default     = ["us-west-2a", "us-west-2b"]
+  description   = "Availability zones in which to create subnets"
+  type          = list(string)
+  default       = ["us-west-2a", "us-west-2b"]
 }
 
 variable "project_name" {
-  description = "Project name"
-  type        = string
+  description   = "Project name"
+  type          = string
 }
 
 variable "subnet_cidr_blocks" {
-  description = "CIDR blocks for subnets"
-  type        = list(string)
-  default     = ["10.0.0.0/24", "10.0.1.0/24"]
+  description   = "CIDR blocks for subnets"
+  type          = list(string)
+  default       = ["10.0.0.0/24", "10.0.1.0/24"]
 }

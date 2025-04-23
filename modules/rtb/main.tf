@@ -16,7 +16,7 @@ resource "aws_route" "default_route" {
 
 # Associate subnets with the route table
 resource "aws_route_table_association" "this" {
-  for_each       = var.subnet_ids
-  subnet_id      = each.value
-  route_table_id = aws_route_table.this.id
+  for_each        = var.subnet_ids
+  subnet_id       = each.value
+  route_table_id  = aws_route_table.this.id
 }
