@@ -23,3 +23,9 @@ variable "igw_id" {
   type        = string
   default     = null
 }
+
+variable "nat_gateway_id" {
+  description = "NAT Gateway ID for private subnets"
+  type        = string
+  default     = null
+}

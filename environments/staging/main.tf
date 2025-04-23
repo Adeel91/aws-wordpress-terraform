@@ -35,6 +35,14 @@ module "igw" {
   project_name      = var.project_name
 }
 
+module "nat_gateway" {
+  source            = "../../modules/natgw"
+  project_name      = var.project_name
+  public_subnet_id  = values(module.public_subnet.subnets)[0] # Picking first public subnet to place the NAT
+  create_eip        = true
+  depends_on        = [module.public_subnet]
+}
+
 # Public Route Table
 module "public_rtb" {
   source            = "../../modules/rtb"
@@ -53,4 +61,5 @@ module "private_rtb" {
   project_name      = var.project_name
   subnet_ids        = module.private_subnet.subnets
   is_public         = false
+  nat_gateway_id    = module.nat_gateway.nat_gateway_id
 }
