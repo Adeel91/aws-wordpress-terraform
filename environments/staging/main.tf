@@ -84,6 +84,7 @@ module "bastion_host" {
   source                  = "../../modules/ec2"
   public_subnet_cidr_az1  = module.public_subnet.subnets[0] # this is the first public subnet in the list of AZ1 public subnet
   project_name            = var.project_name
+  depends_on = [ module.private_sg ]
 }
 
 # Create WordPress Instance in 1 of the private subnet
@@ -91,6 +92,7 @@ module "wordpress_az1" {
   source                  = "../../modules/ec2"
   private_subnet_cidr_az1 = module.private_subnet.subnets[0] # this is the first private subnet in the list of AZ1 private subnet
   project_name            = var.project_name
+  depends_on = [ module.private_sg ]
 }
 
 # Create WordPress Instance in second of the private subnet
@@ -98,4 +100,5 @@ module "wordpress_az2" {
   source                  = "../../modules/ec2"
   private_subnet_cidr_az2 = module.private_subnet.subnets[1] # this is the second private subnet in the list of AZ2 private subne
   project_name            = var.project_name
+  depends_on = [ module.private_sg ]
 }
