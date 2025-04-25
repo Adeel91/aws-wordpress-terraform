@@ -2,7 +2,7 @@ resource "aws_instance" "bastion" {
   ami                         = "ami-0440d3b780d96b29d"
   instance_type               = "t2.micro"
   subnet_id                   = var.public_subnet_cidr_az1
-  vpc_security_group_ids      = [module.public_sg.public_sg_id]
+  vpc_security_group_ids      = [var.security_group_id]
   associate_public_ip_address = true
   key_name                    = var.key_name
 
@@ -12,11 +12,11 @@ resource "aws_instance" "bastion" {
 }
 
 resource "aws_instance" "wordpress_az1" {
-  ami                    = "ami-0440d3b780d96b29d"
-  instance_type          = "t2.micro"
-  subnet_id              = var.private_subnet_cidr_az1
-  vpc_security_group_ids = [module.private_sg.private_sg_id]
-  key_name               = var.key_name
+  ami                         = "ami-0440d3b780d96b29d"
+  instance_type               = "t2.micro"
+  subnet_id                   = var.private_subnet_cidr_az1
+  vpc_security_group_ids      = [var.security_group_id]
+  key_name                    = var.key_name
   associate_public_ip_address = false
 
   root_block_device {
@@ -31,11 +31,11 @@ resource "aws_instance" "wordpress_az1" {
 }
 
 resource "aws_instance" "wordpress_az2" {
-  ami                    = "ami-0440d3b780d96b29d"
-  instance_type          = "t2.micro"
-  subnet_id              = var.private_subnet_cidr_az2
-  vpc_security_group_ids = [module.private_sg.private_sg_id]
-  key_name               = var.key_name
+  ami                         = "ami-0440d3b780d96b29d"
+  instance_type               = "t2.micro"
+  subnet_id                   = var.private_subnet_cidr_az2
+  vpc_security_group_ids      = [var.security_group_id]
+  key_name                    = var.key_name
   associate_public_ip_address = false
 
   root_block_device {

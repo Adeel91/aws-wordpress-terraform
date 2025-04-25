@@ -11,6 +11,6 @@ terraform {
 module "environment" {
   # @todo: change this to dynamically selecting environment
   # based on the terraform workspace selected.
-  source = "./environments/staging"
+  source       = "./environments/staging"
   project_name = var.project_name
 }

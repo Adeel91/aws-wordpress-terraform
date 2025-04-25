@@ -11,8 +11,8 @@ resource "aws_route" "default_route" {
   route_table_id         = aws_route_table.this.id
   destination_cidr_block = "0.0.0.0/0"
 
-  gateway_id      = var.is_public ? var.igw_id : null
-  nat_gateway_id  = var.is_public ? null : var.nat_gateway_id
+  gateway_id     = var.is_public ? var.igw_id : null
+  nat_gateway_id = var.is_public ? null : var.nat_gateway_id
 
   lifecycle {
     ignore_changes = [gateway_id, nat_gateway_id]
@@ -25,7 +25,7 @@ resource "aws_route" "default_route" {
 
 # Associate subnets with the route table
 resource "aws_route_table_association" "this" {
-  for_each        = var.subnet_ids
-  subnet_id       = each.value
-  route_table_id  = aws_route_table.this.id
+  for_each       = var.subnet_ids
+  subnet_id      = each.value
+  route_table_id = aws_route_table.this.id
 }
