@@ -63,3 +63,18 @@ module "private_rtb" {
   is_public         = false
   nat_gateway_id    = module.nat_gateway.nat_gateway_id
 }
+
+# Create Public Security Group for Bastion Host
+module "public_sg" {
+  source       = "../../modules/sg"
+  vpc_id       = module.vpc.vpc_id
+  project_name = var.project_name
+}
+
+# Create Private Security Group for WordPress Instance
+module "private_sg" {
+  source              = "../../modules/sg"
+  vpc_id              = module.vpc.vpc_id
+  project_name        = var.project_name
+  private_subnet_cidr = "10.0.1.0/24"
+}
