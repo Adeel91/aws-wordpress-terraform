@@ -1,4 +1,4 @@
-resource "aws_instance" "bastion" {
+resource "aws_instance" "ec2_bastion_host" {
   ami                         = "ami-0440d3b780d96b29d"
   instance_type               = "t2.micro"
   subnet_id                   = var.public_subnet_cidr_az1
@@ -11,7 +11,7 @@ resource "aws_instance" "bastion" {
   }
 }
 
-resource "aws_instance" "wordpress_az1" {
+resource "aws_instance" "ec2_wordpress_az1" {
   ami                         = "ami-0440d3b780d96b29d"
   instance_type               = "t2.micro"
   subnet_id                   = var.private_subnet_cidr_az1
@@ -30,7 +30,7 @@ resource "aws_instance" "wordpress_az1" {
   }
 }
 
-resource "aws_instance" "wordpress_az2" {
+resource "aws_instance" "ec2_wordpress_az2" {
   ami                         = "ami-0440d3b780d96b29d"
   instance_type               = "t2.micro"
   subnet_id                   = var.private_subnet_cidr_az2
