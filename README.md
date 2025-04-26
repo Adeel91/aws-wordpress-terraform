@@ -3,7 +3,7 @@
 </p>
 
 
-# 🚀 Automated WordPress Setup on AWS with Terraform 🌐
+# 🚀 Automated WordPress Setup on AWS with Terraform
 
 This project sets up the infrastructure needed to deploy a WordPress website on AWS using Terraform. It provisions the required resources like VPC, subnets, EC2 instances, security groups, and an Application Load Balancer (ALB). The goal is to provide a scalable, secure, and cost-efficient environment to run WordPress.
 
