@@ -49,7 +49,10 @@ module "public_rtb" {
   source       = "../../modules/rtb"
   vpc_id       = module.vpc.vpc_id
   project_name = var.project_name
-  subnet_ids   = [for subnet in module.public_subnet.subnets : subnet.id]
+  subnet_ids   = {
+    for subnet_name, subnet_info in module.public_subnet.subnets :
+    subnet_name => subnet_info.id
+  }
   is_public    = true
   igw_id       = module.igw.igw_id
   depends_on   = [module.igw]
@@ -60,7 +63,10 @@ module "private_rtb" {
   source         = "../../modules/rtb"
   vpc_id         = module.vpc.vpc_id
   project_name   = var.project_name
-  subnet_ids     = [for subnet in module.public_subnet.subnets : subnet.id]
+  subnet_ids = {
+    for subnet_name, subnet_info in module.private_subnet.subnets :
+    subnet_name => subnet_info.id
+  }
   is_public      = false
   nat_gateway_id = module.nat_gateway.nat_gateway_id
 }
