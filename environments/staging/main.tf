@@ -78,7 +78,7 @@ module "private_sg" {
   source              = "../../modules/sg"
   vpc_id              = module.vpc.vpc_id
   project_name        = var.project_name
-  subnet_cidr         = "10.0.1.0/24"
+  subnet_cidr         = module.public_subnet.subnets["${var.project_name}-public-subnet1"] # Only allow Bastion's Host subnet to SSH
 }
 
 # Create Bastion Host in 1 of the public subnet
@@ -108,10 +108,10 @@ module "ec2_wordpress_az2" {
   depends_on              = [module.private_sg]
 }
 
-# module "alb" {
-#   source            = "../../modules/alb"
-#   project_name      = var.project_name
-#   security_group_id = module.public_sg.public_sg_id                                               # Use the public security group
-#   subnet_ids        = [module.private_subnet.subnets[0], module.private_subnet.subnets[1]] # Use the public subnets in AZ1 and AZ2
-#   vpc_id            = module.vpc.vpc_id
-# }
+module "alb" {
+  source            = "../../modules/alb"
+  project_name      = var.project_name
+  security_group_id = module.public_sg.public_sg_id # Use the public security group
+  subnet_ids        = [module.private_subnet.subnets["${var.project_name}-private-subnet1"], module.private_subnet.subnets["${var.project_name}-private-subnet2"]] # Use the public subnets in AZ1 and AZ2
+  vpc_id            = module.vpc.vpc_id
+}

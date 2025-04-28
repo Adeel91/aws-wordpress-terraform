@@ -31,10 +31,11 @@ resource "aws_security_group" "private_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 0
-    to_port     = 0
+    description = "SSH from Bastion Host"
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.subnet_cidr]
+    cidr_blocks = [var.subnet_cidr] # Bastion's public subnet CIDR only to allow ssh with Bastion SG
   }
 
   egress {
