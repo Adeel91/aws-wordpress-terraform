@@ -17,3 +17,13 @@ variable "vpc_id" {
   description = "VPC ID where the ALB is located"
   type        = string
 }
+
+variable "wordpress_az1_id" {
+  description = "Instance ID of the WordPress EC2 instance in AZ1"
+  type        = string
+}
+
+variable "wordpress_az2_id" {
+  description = "Instance ID of the WordPress EC2 instance in AZ2"
+  type        = string
+}
