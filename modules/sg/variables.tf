@@ -10,5 +10,5 @@ variable "project_name" {
 
 variable "subnet_cidr" {
   description = "CIDR block for the private subnets"
-  type        = string
+  type        = list(string)
 }

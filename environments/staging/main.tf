@@ -70,7 +70,7 @@ module "public_sg" {
   source       = "../../modules/sg"
   vpc_id       = module.vpc.vpc_id
   project_name = var.project_name
-  subnet_cidr  = "0.0.0.0/0"
+  subnet_cidr  = ["0.0.0.0/0"]
 }
 
 # Create Private Security Group for WordPress Instance
@@ -78,7 +78,7 @@ module "private_sg" {
   source              = "../../modules/sg"
   vpc_id              = module.vpc.vpc_id
   project_name        = var.project_name
-  subnet_cidr         = module.public_subnet.subnets["${var.project_name}-public-subnet1"] # Only allow Bastion's Host subnet to SSH
+  subnet_cidr         = [module.public_subnet.subnets["${var.project_name}-public-subnet1"]] # Only allow Bastion's Host subnet to SSH
 }
 
 # Create Public Security Group for ALB
@@ -86,7 +86,18 @@ module "public_lg_sg" {
   source              = "../../modules/sg"
   vpc_id              = module.vpc.vpc_id
   project_name        = var.project_name
-  subnet_cidr         = "0.0.0.0/0"
+  subnet_cidr         = ["0.0.0.0/0"]
+}
+
+# Create Private Security Group for RDS Instance
+module "private_rds_sg" {
+  source              = "../../modules/sg"
+  vpc_id              = module.vpc.vpc_id
+  project_name        = var.project_name
+  subnet_cidr         = [
+    module.private_subnet.subnets["${var.project_name}-private-subnet1"],  # Subnet in AZ1
+    module.private_subnet.subnets["${var.project_name}-private-subnet2"]   # Subnet in AZ2
+  ]
 }
 
 # Create Bastion Host in 1 of the public subnet
@@ -114,6 +125,18 @@ module "ec2_wordpress_az2" {
   project_name            = var.project_name
   security_group_id       = module.private_sg.private_sg_id
   depends_on              = [module.private_sg]
+}
+
+# Reference the RDS MariaDB module and pass necessary parameters
+module "rds" {
+  source                = "../../modules/rds"
+  project_name          = var.project_name
+  db_name               = "aws-wordpress-terraform"
+  db_username           = "root"
+  db_password           = "root"
+  private_subnet_ids    = [module.private_subnet.subnets["${var.project_name}-private-subnet1"], module.private_subnet.subnets["${var.project_name}-private-subnet2"]]
+  security_group_id     = module.private_rds_sg.private_rds_sg_id
+  db_subnet_group_name  = "${var.project_name}-mariadb-subnet-group"
 }
 
 module "alb" {

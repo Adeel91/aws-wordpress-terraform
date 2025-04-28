@@ -1,6 +1,6 @@
 resource "aws_security_group" "public_sg" {
   name        = "${var.project_name}-public-sg"
-  description = "Allow public access to public resources (e.g., Load Balancer)"
+  description = "Allow public access to public resources (e.g., EC2)"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -8,7 +8,7 @@ resource "aws_security_group" "public_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.subnet_cidr]
+    cidr_blocks = var.subnet_cidr
   }
 
   # Allow all outbound traffic
@@ -35,7 +35,7 @@ resource "aws_security_group" "private_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.subnet_cidr] # Bastion's public subnet CIDR only to allow ssh with Bastion SG
+    cidr_blocks = var.subnet_cidr # Bastion's public subnet CIDR only to allow ssh with Bastion SG
   }
 
   egress {
@@ -59,7 +59,7 @@ resource "aws_security_group" "public_lb_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [var.subnet_cidr]
+    cidr_blocks = var.subnet_cidr
   }
 
   egress {
@@ -71,5 +71,30 @@ resource "aws_security_group" "public_lb_sg" {
 
   tags = {
     Name = "${var.project_name}-public-lb-sg"
+  }
+}
+
+resource "aws_security_group" "private_rds_sg" {
+  name        = "${var.project_name}-private-rds-sg"
+  description = "Allow access to MariaDB RDS from EC2 instances in private subnets"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description = "SSH from Bastion Host"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.subnet_cidr
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # Allow all outbound traffic
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-private-rds-sg"
   }
 }

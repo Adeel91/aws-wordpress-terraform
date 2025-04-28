@@ -1,0 +1,21 @@
+resource "aws_db_instance" "mariadb_instance" {
+  identifier              = "${var.project_name}-mariadb"
+  engine                  = "mariadb"
+  engine_version          = "10.5"
+  instance_class          = "db.t3.medium"
+  allocated_storage       = 20
+  storage_type            = "gp2"
+  db_name                 = var.db_name
+  username                = var.db_username
+  password                = var.db_password
+  multi_az                = true  # Multi-AZ enabled for high availability
+  vpc_security_group_ids  = [var.security_group_id]
+  db_subnet_group_name    = var.db_subnet_group_name  # Reference to the subnet group
+  publicly_accessible     = false  # RDS should not be publicly accessible
+
+  tags = {
+    Name = "${var.project_name}-mariadb"
+  }
+
+  final_snapshot_identifier = "${var.project_name}-final-snapshot"
+}

@@ -12,3 +12,8 @@ output "public_lb_sg_id" {
   description = "The ID of the public alb security group"
   value       = aws_security_group.public_lb_sg.id
 }
+
+output "private_rds_sg_id" {
+  description = "The ID of the public alb security group"
+  value       = aws_security_group.private_rds_sg.id
+}
