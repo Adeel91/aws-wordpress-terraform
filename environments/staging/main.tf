@@ -111,7 +111,7 @@ module "ec2_wordpress_az2" {
 module "alb" {
   source            = "../../modules/alb"
   project_name      = var.project_name
-  security_group_id = module.public_sg.public_sg_id # Use the public security group
-  subnet_ids        = [module.private_subnet.subnets["${var.project_name}-private-subnet1"], module.private_subnet.subnets["${var.project_name}-private-subnet2"]] # Use the public subnets in AZ1 and AZ2
+  security_group_id = aws_security_group.public_lg_sg.id # Use the public security group
+  subnet_ids        = [module.public_subnet.subnets["${var.project_name}-public-subnet1"], module.public_subnet.subnets["${var.project_name}-public-subnet2"]] # Use the public subnets in AZ1 and AZ2
   vpc_id            = module.vpc.vpc_id
 }

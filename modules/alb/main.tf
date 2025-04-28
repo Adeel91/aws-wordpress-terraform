@@ -37,11 +37,19 @@ resource "aws_lb_listener" "http_listener" {
   protocol          = "HTTP"
 
   default_action {
-    type = "fixed-response"
-    fixed_response {
-      status_code  = 200
-      content_type = "text/plain"
-      message_body = "ALB is working"
-    }
+    type = "forward"
+    target_group_arn = aws_lb_target_group.target_group.arn  # Forward traffic to the target group
   }
+}
+
+resource "aws_lb_target_group_attachment" "wordpress_targets_az1" {
+  target_group_arn = aws_lb_target_group.target_group.arn
+  target_id        = module.ec2_wordpress_az1.id # Attach first WordPress instance
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "wordpress_targets_az2" {
+  target_group_arn = aws_lb_target_group.target_group.arn
+  target_id        = module.ec2_wordpress_az12.id # Attach second WordPress instance
+  port             = 80
 }
