@@ -1,10 +1,11 @@
 resource "aws_instance" "ec2_bastion_host" {
-  ami                         = "ami-0440d3b780d96b29d"
+  ami                         = var.aws_ami
   instance_type               = "t2.micro"
   subnet_id                   = var.public_subnet_cidr_az1
   vpc_security_group_ids      = [var.security_group_id]
   associate_public_ip_address = true
   key_name                    = var.key_name
+  user_data                   = file("${path.module}/scripts/bastion-setup.sh")
 
   tags = {
     Name = "${var.project_name}-bastion"
@@ -12,16 +13,17 @@ resource "aws_instance" "ec2_bastion_host" {
 }
 
 resource "aws_instance" "ec2_wordpress_az1" {
-  ami                         = "ami-0440d3b780d96b29d"
+  ami                         = var.aws_ami
   instance_type               = "t2.micro"
   subnet_id                   = var.private_subnet_cidr_az1
   vpc_security_group_ids      = [var.security_group_id]
   key_name                    = var.key_name
   associate_public_ip_address = false
+  user_data                   = file("${path.module}/scripts/wordpress-setup.sh")
 
   root_block_device {
     volume_size = 20
-    volume_type = "gp3"
+    volume_type = "gp2"
     encrypted   = true
   }
 
@@ -31,16 +33,17 @@ resource "aws_instance" "ec2_wordpress_az1" {
 }
 
 resource "aws_instance" "ec2_wordpress_az2" {
-  ami                         = "ami-0440d3b780d96b29d"
+  ami                         = var.aws_ami
   instance_type               = "t2.micro"
   subnet_id                   = var.private_subnet_cidr_az2
   vpc_security_group_ids      = [var.security_group_id]
   key_name                    = var.key_name
   associate_public_ip_address = false
+  user_data                   = file("${path.module}/scripts/wordpress-setup.sh")
 
   root_block_device {
     volume_size = 20
-    volume_type = "gp3"
+    volume_type = "gp2"
     encrypted   = true
   }
 

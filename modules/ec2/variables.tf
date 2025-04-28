@@ -1,3 +1,9 @@
+variable "aws_ami" {
+  description = "Latest Amazon Linux 2 AMI"
+  type = string
+  default = "ami-0d61ea20f09848335"
+}
+
 variable "public_subnet_cidr_az1" {
   description = "The CIDR block for the public subnet in AZ1"
   type        = string
