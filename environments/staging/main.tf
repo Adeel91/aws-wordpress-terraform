@@ -81,6 +81,14 @@ module "private_sg" {
   subnet_cidr         = module.public_subnet.subnets["${var.project_name}-public-subnet1"] # Only allow Bastion's Host subnet to SSH
 }
 
+# Create Public Security Group for ALB
+module "public_lg_sg" {
+  source              = "../../modules/sg"
+  vpc_id              = module.vpc.vpc_id
+  project_name        = var.project_name
+  subnet_cidr         = "0.0.0.0/0"
+}
+
 # Create Bastion Host in 1 of the public subnet
 module "ec2_bastion_host" {
   source                 = "../../modules/ec2"
