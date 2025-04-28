@@ -8,7 +8,7 @@ resource "aws_security_group" "public_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.subnet_cidr]
   }
 
   # Allow all outbound traffic
@@ -17,7 +17,7 @@ resource "aws_security_group" "public_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.subnet_cidr]
   }
 
   tags = {
@@ -34,7 +34,7 @@ resource "aws_security_group" "private_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "tcp"
-    cidr_blocks = [var.private_subnet_cidr] # You can use the private subnet CIDR for internal communication
+    cidr_blocks = [var.subnet_cidr]
   }
 
   egress {

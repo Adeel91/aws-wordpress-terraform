@@ -70,6 +70,7 @@ module "public_sg" {
   source       = "../../modules/sg"
   vpc_id       = module.vpc.vpc_id
   project_name = var.project_name
+  subnet_cidr  = "0.0.0.0/0"
 }
 
 # Create Private Security Group for WordPress Instance
@@ -77,7 +78,7 @@ module "private_sg" {
   source              = "../../modules/sg"
   vpc_id              = module.vpc.vpc_id
   project_name        = var.project_name
-  private_subnet_cidr = "10.0.1.0/24"
+  subnet_cidr         = "10.0.1.0/24"
 }
 
 # Create Bastion Host in 1 of the public subnet
