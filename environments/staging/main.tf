@@ -83,7 +83,7 @@ module "private_sg" {
 # Create Bastion Host in 1 of the public subnet
 module "ec2_bastion_host" {
   source                 = "../../modules/ec2"
-  public_subnet_cidr_az1 = module.public_subnet.subnets[0] # this is the first public subnet in the list of AZ1 public subnet
+  public_subnet_cidr_az1 = module.public_subnet.subnets["${var.project_name}-public-subnet1"] # this is the first public subnet in the list of AZ1 public subnet
   project_name           = var.project_name
   security_group_id      = module.public_sg.private_sg_id
   depends_on             = [module.private_sg]
@@ -92,7 +92,7 @@ module "ec2_bastion_host" {
 # Create WordPress Instance in 1 of the private subnet
 module "ec2_wordpress_az1" {
   source                  = "../../modules/ec2"
-  private_subnet_cidr_az1 = module.private_subnet.subnets[0] # this is the first private subnet in the list of AZ1 private subnet
+  private_subnet_cidr_az1 = module.private_subnet.subnets["${var.project_name}-private-subnet1"] # this is the first private subnet in the list of AZ1 private subnet
   project_name            = var.project_name
   security_group_id       = module.private_sg.private_sg_id
   depends_on              = [module.private_sg]
@@ -101,16 +101,16 @@ module "ec2_wordpress_az1" {
 # Create WordPress Instance in second of the private subnet
 module "ec2_wordpress_az2" {
   source                  = "../../modules/ec2"
-  private_subnet_cidr_az2 = module.private_subnet.subnets[1] # this is the second private subnet in the list of AZ2 private subne
+  private_subnet_cidr_az2 = module.private_subnet.subnets["${var.project_name}-private-subnet2"] # this is the second private subnet in the list of AZ2 private subnet
   project_name            = var.project_name
   security_group_id       = module.private_sg.private_sg_id
   depends_on              = [module.private_sg]
 }
 
-module "alb" {
-  source            = "../../modules/alb"
-  project_name      = var.project_name
-  security_group_id = module.public_sg.public_sg_id                                               # Use the public security group
-  subnet_ids        = [module.private_subnet.subnets[0], module.private_subnet.subnets[1]] # Use the public subnets in AZ1 and AZ2
-  vpc_id            = module.vpc.vpc_id
-}
+# module "alb" {
+#   source            = "../../modules/alb"
+#   project_name      = var.project_name
+#   security_group_id = module.public_sg.public_sg_id                                               # Use the public security group
+#   subnet_ids        = [module.private_subnet.subnets[0], module.private_subnet.subnets[1]] # Use the public subnets in AZ1 and AZ2
+#   vpc_id            = module.vpc.vpc_id
+# }

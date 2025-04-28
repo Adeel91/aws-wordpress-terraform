@@ -11,5 +11,4 @@ variable "project_name" {
 variable "private_subnet_cidr" {
   description = "CIDR block for the private subnets"
   type        = string
-  default     = ""
 }
