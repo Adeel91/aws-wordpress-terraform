@@ -1,7 +1,7 @@
 locals {
   instances = [
     {
-      name                        = "bastion_host"
+      name                        = "bastion-host"
       ami                         = var.aws_ami
       instance_type               = "t2.micro"
       subnet_id                   = var.public_subnet1_id
@@ -12,7 +12,7 @@ locals {
       tags                        = { Name = "${var.project_name}-bastion" }
     },
     {
-      name                        = "wordpress_az1"
+      name                        = "wordpress-webserver-az1"
       ami                         = var.aws_ami
       instance_type               = "t2.micro"
       subnet_id                   = var.private_subnet1_id
@@ -28,7 +28,7 @@ locals {
       }]
     },
     {
-      name                        = "wordpress_az2"
+      name                        = "wordpress-webserver-az2"
       ami                         = var.aws_ami
       instance_type               = "t2.micro"
       subnet_id                   = var.private_subnet2_id
