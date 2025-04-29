@@ -1,68 +1,84 @@
 #!/bin/bash
 
-# Exit the script if any command fails
+# Configuration Variables
+WEB_ROOT="/var/www/html"
+LOG_FILE="/var/log/wordpress-setup.log"
+DB_NAME="wordpressdb"
+DB_USER="admin"
+DB_HOST="wordpress-mariadb.csjbpamc4jwr.us-west-2.rds.amazonaws.com"
+
+# Initialize logging
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "$(date) - Starting WordPress installation"
+
+# Exit immediately on error and log all commands
 set -e
+trap 'echo "$(date) - ERROR at line $LINENO"; exit 1' ERR
 
 # Update system packages
+echo "Updating system packages..."
 sudo yum update -y
 
-# Install EPEL and Remi repositories to get the latest PHP versions
-sudo yum install -y epel-release
-sudo yum install -y https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+# Enable and install PHP 8.1
+echo "Configuring PHP 8.1..."
+sudo amazon-linux-extras enable php8.1 -y
+sudo yum clean metadata
+sudo yum install -y php php-cli php-mysqlnd php-fpm php-xml php-mbstring php-opcache php-gd
 
-# Enable the Remi PHP repository and install PHP 8.0
-sudo yum install -y yum-utils
-sudo yum module reset php
-sudo yum module enable php:remi-8.0  # Enabling PHP 8.0
-sudo yum install -y php php-cli php-fpm php-mysqlnd php-xml php-mbstring wget unzip
+# Install and configure Apache
+echo "Installing Apache..."
+sudo yum install -y httpd mod_ssl
+sudo systemctl enable --now httpd
 
-# Start and enable Apache web server
-sudo systemctl start httpd
-sudo systemctl enable httpd
+# Configure PHP-FPM
+echo "Configuring PHP-FPM..."
+sudo systemctl enable --now php-fpm
 
-# Start and enable PHP-FPM
-sudo systemctl start php-fpm
-sudo systemctl enable php-fpm
-
-# Download and extract WordPress
-wget https://wordpress.org/latest.tar.gz
-tar -xvzf latest.tar.gz
-sudo mv wordpress/* /var/www/html/
-
-# Clean up the tar file
+# Download WordPress
+echo "Downloading WordPress..."
+wget -q https://wordpress.org/latest.tar.gz || { echo "WordPress download failed"; exit 1; }
+tar -xzf latest.tar.gz
 rm -f latest.tar.gz
 
-# Set proper ownership and permissions
-# Ensure Apache can read/write to the WordPress directory
-sudo chown -R apache:apache /var/www/html/
-sudo chmod -R 755 /var/www/html/
+# Deploy WordPress
+echo "Deploying WordPress files..."
+sudo rsync -a wordpress/ "$WEB_ROOT/"
+rm -rf wordpress
 
-# Secure wp-config.php by setting appropriate permissions
-cd /var/www/html
-sudo cp wp-config-sample.php wp-config.php
+# Set permissions
+echo "Setting permissions..."
+sudo chown -R apache:apache "$WEB_ROOT"
+sudo find "$WEB_ROOT" -type d -exec chmod 755 {} \;
+sudo find "$WEB_ROOT" -type f -exec chmod 644 {} \;
 
-# Automate wp-config.php with database credentials using define() method
-sudo sed -i "s/define( 'DB_NAME', 'database_name_here' );/define( 'DB_NAME', 'wordpressdb' );/" wp-config.php
-sudo sed -i "s/define( 'DB_USER', 'username_here' );/define( 'DB_USER', 'admin' );/" wp-config.php
-sudo sed -i "s/define( 'DB_PASSWORD', 'password_here' );/define( 'DB_PASSWORD', 'admin12345' );/" wp-config.php
-sudo sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', 'wordpress-mariadb.csjbpamc4jwr.us-west-2.rds.amazonaws.com' );/" wp-config.php
+# Configure database connection
+echo "Configuring database connection..."
+sudo cp "$WEB_ROOT/wp-config-sample.php" "$WEB_ROOT/wp-config.php"
+sudo sed -i "s/define( 'DB_NAME', 'database_name_here' );/define( 'DB_NAME', '$DB_NAME' );/" "$WEB_ROOT/wp-config.php"
+sudo sed -i "s/define( 'DB_USER', 'username_here' );/define( 'DB_USER', '$DB_USER' );/" "$WEB_ROOT/wp-config.php"
+sudo sed -i "s/define( 'DB_PASSWORD', 'password_here' );/define( 'DB_PASSWORD', '$DB_PASS' );/" "$WEB_ROOT/wp-config.php"
+sudo sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', '$DB_HOST' );/" "$WEB_ROOT/wp-config.php"
 
-# Secure wp-config.php
-sudo chmod 640 wp-config.php
+# Security hardening
+echo "Applying security settings..."
+sudo chmod 440 "$WEB_ROOT/wp-config.php"
+sudo setsebool -P httpd_unified 1
 
-# Configure Apache to use PHP-FPM (Ensure PHP-FPM is installed and running)
-echo '<IfModule mod_proxy_fcgi.c>
-  <FilesMatch \.php$>
-    SetHandler proxy:fcgi://127.0.0.1:9000
-  </FilesMatch>
-</IfModule>' | sudo tee /etc/httpd/conf.d/php-fpm.conf
+# Configure PHP-FPM with Apache
+echo "Configuring Apache for PHP-FPM..."
+sudo tee /etc/httpd/conf.d/php-fpm.conf > /dev/null <<'EOL'
+<FilesMatch \.php$>
+    SetHandler "proxy:fcgi://127.0.0.1:9000"
+</FilesMatch>
+EOL
 
-# Restart Apache to apply changes
-sudo systemctl restart httpd
+# Final restart
+echo "Restarting services..."
+sudo systemctl restart php-fpm httpd
 
-# Check for any errors
-sudo systemctl status httpd
-sudo systemctl status php-fpm
+# Verify installation
+echo "Verifying installation..."
+curl -Is http://localhost | head -1 | grep -q "200 OK" || { echo "Apache not responding"; exit 1; }
+sudo -u apache php -r "require '$WEB_ROOT/wp-config.php'; echo 'DB connection: ' . (defined('DB_NAME') ? 'OK' : 'FAILED') . PHP_EOL;" | tee -a "$LOG_FILE"
 
-# Final message
-echo "✅ WordPress is configured and connected to RDS MariaDB!"
+echo "$(date) - ✅ WordPress installation with PHP 8.1 completed successfully!"
