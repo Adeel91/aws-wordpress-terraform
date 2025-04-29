@@ -172,8 +172,8 @@ module "rds" {
   source                = "../../modules/rds"
   project_name          = var.project_name
   db_name               = "${var.project_name}db"
-  db_username           = "root"
-  db_password           = "root"
+  db_username           = "admin"
+  db_password           = "admin12345"
   private_subnet_ids    = [
     module.private_subnet.subnets["${var.project_name}-private-subnet1"].id,
     module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
