@@ -153,12 +153,27 @@ module "private_rds_sg" {
   }]
 }
 
+# Create EC2 Instances in Public and Private Subnets (Bastion & WordPress)
+module "ec2_instances" {
+  source = "../../modules/ec2"
+  project_name = var.project_name
+
+  # Network Subnets and Security Groups
+  public_subnet_cidr_az1 = local.public_subnet1_cidr
+  private_subnet_cidr_az1 = local.private_subnet1_cidr
+  private_subnet_cidr_az2 = local.private_subnet2_cidr
+
+  public_sg_id = module.public_sg.sg_id
+  private_sg_id = module.private_sg.sg_id
+}
+
+############################################################################
 # # Create Bastion Host in 1 of the public subnet
 # module "ec2_bastion_host" {
 #   source                 = "../../modules/ec2"
 #   public_subnet_cidr_az1 = module.public_subnet.subnets["${var.project_name}-public-subnet1"].cidr # this is the first public subnet in the list of AZ1 public subnet
 #   project_name           = var.project_name
-#   security_group_id      = module.public_sg.private_sg_id
+#   security_group_id      = module.public_sg.sg_id
 #   depends_on             = [module.private_sg]
 # }
 
@@ -167,7 +182,7 @@ module "private_rds_sg" {
 #   source                  = "../../modules/ec2"
 #   private_subnet_cidr_az1 = module.private_subnet.subnets["${var.project_name}-private-subnet1"].cidr # this is the first private subnet in the list of AZ1 private subnet
 #   project_name            = var.project_name
-#   security_group_id       = module.private_sg.private_sg_id
+#   security_group_id       = module.private_sg.sg_id
 #   depends_on              = [module.private_sg]
 # }
 
@@ -176,9 +191,10 @@ module "private_rds_sg" {
 #   source                  = "../../modules/ec2"
 #   private_subnet_cidr_az2 = module.private_subnet.subnets["${var.project_name}-private-subnet2"].cidr # this is the second private subnet in the list of AZ2 private subnet
 #   project_name            = var.project_name
-#   security_group_id       = module.private_sg.private_sg_id
+#   security_group_id       = module.private_sg.sg_id
 #   depends_on              = [module.private_sg]
 # }
+############################################################################
 
 # # Reference the RDS MariaDB module and pass necessary parameters
 # module "rds" {

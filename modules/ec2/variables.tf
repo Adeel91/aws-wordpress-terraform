@@ -22,8 +22,13 @@ variable "private_subnet_cidr_az2" {
   default     = null
 }
 
-variable "security_group_id" {
-  description = "The seucirty group for the instance"
+variable "public_sg_id" {
+  description = "The seucirty group for the instance in public subnet"
+  type        = string
+}
+
+variable "private_sg_id" {
+  description = "The seucirty group for the instance in private subnet"
   type        = string
 }
 
