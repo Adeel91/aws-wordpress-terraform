@@ -58,8 +58,10 @@ resource "aws_instance" "this" {
   user_data                   = each.value.user_data
   tags                        = each.value.tags
 
+  # Dynamically creating the root_block_device if it exists in the instance definition
   dynamic "root_block_device" {
-    for_each = each.value.root_block_device != null ? [each.value.root_block_device] : []
+    for_each = (lookup(each.value, "root_block_device", null) != null) ? [each.value.root_block_device] : []
+
     content {
       volume_size = root_block_device.value[0].volume_size
       volume_type = root_block_device.value[0].volume_type
