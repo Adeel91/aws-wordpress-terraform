@@ -4,19 +4,19 @@ variable "aws_ami" {
   default = "ami-0d61ea20f09848335"
 }
 
-variable "public_subnet_cidr_az1" {
+variable "public_subnet1_id" {
   description = "The CIDR block for the public subnet in AZ1"
   type        = string
   default     = null
 }
 
-variable "private_subnet_cidr_az1" {
+variable "private_subnet1_id" {
   description = "The CIDR block for the private subnet in AZ1"
   type        = string
   default     = null
 }
 
-variable "private_subnet_cidr_az2" {
+variable "private_subnet2_id" {
   description = "The CIDR block for the private subnet in AZ2"
   type        = string
   default     = null

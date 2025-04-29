@@ -159,9 +159,9 @@ module "ec2_instances" {
   project_name = var.project_name
 
   # Network Subnets and Security Groups
-  public_subnet_cidr_az1 = local.public_subnet1_cidr
-  private_subnet_cidr_az1 = local.private_subnet1_cidr
-  private_subnet_cidr_az2 = local.private_subnet2_cidr
+  public_subnet1_id = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
+  private_subnet1_id = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
+  private_subnet2_id = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
 
   public_sg_id = module.public_sg.sg_id
   private_sg_id = module.private_sg.sg_id

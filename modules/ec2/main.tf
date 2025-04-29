@@ -4,7 +4,7 @@ locals {
       name                        = "bastion_host"
       ami                         = var.aws_ami
       instance_type               = "t2.micro"
-      subnet_id                   = var.public_subnet_cidr_az1
+      subnet_id                   = var.public_subnet1_id
       security_group_ids          = [var.public_sg_id]
       associate_public_ip_address = true
       key_name                    = var.key_name
@@ -15,7 +15,7 @@ locals {
       name                        = "wordpress_az1"
       ami                         = var.aws_ami
       instance_type               = "t2.micro"
-      subnet_id                   = var.private_subnet_cidr_az1
+      subnet_id                   = var.private_subnet1_id
       security_group_ids          = [var.private_sg_id]
       associate_public_ip_address = false
       key_name                    = var.key_name
@@ -31,7 +31,7 @@ locals {
       name                        = "wordpress_az2"
       ami                         = var.aws_ami
       instance_type               = "t2.micro"
-      subnet_id                   = var.private_subnet_cidr_az2
+      subnet_id                   = var.private_subnet2_id
       security_group_ids          = [var.private_sg_id]
       associate_public_ip_address = false
       key_name                    = var.key_name
