@@ -3,10 +3,10 @@
 # Configuration Variables
 WEB_ROOT="/var/www/html"
 LOG_FILE="/var/log/wordpress-setup.log"
-DB_NAME="${DB_NAME:-wordpressdb}"
-DB_USER="${DB_USER:-admin}"
-DB_PASS="${DB_PASS:-admin123}"
-DB_HOST="${DB_HOST:-localhost}"
+DB_NAME="${$${DB_NAME:-wordpressdb}}"
+DB_USER="${$${DB_USER:-admin}}"
+DB_PASS="${$${DB_PASS:-admin123}}"
+DB_HOST="${$${DB_HOST:-localhost}}"
 
 # Initialize logging
 exec > >(tee -a "$LOG_FILE") 2>&1
