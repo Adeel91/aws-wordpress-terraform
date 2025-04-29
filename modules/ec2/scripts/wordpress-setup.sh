@@ -3,9 +3,10 @@
 # Configuration Variables
 WEB_ROOT="/var/www/html"
 LOG_FILE="/var/log/wordpress-setup.log"
-DB_NAME="wordpressdb"
-DB_USER="admin"
-DB_HOST="wordpress-mariadb.csjbpamc4jwr.us-west-2.rds.amazonaws.com"
+DB_NAME="${DB_NAME:-wordpressdb}"  # Default value if not set
+DB_USER="${DB_USER:-admin}"        # Default value if not set
+DB_PASS="${DB_PASS:-admin123}"    # Default value if not set
+DB_HOST="${DB_HOST:-localhost}"    # Default value if not set
 
 # Initialize logging
 exec > >(tee -a "$LOG_FILE") 2>&1

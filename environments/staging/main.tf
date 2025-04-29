@@ -4,6 +4,10 @@ locals {
 
   private_subnet1_cidr = "10.0.1.0/24"
   private_subnet2_cidr = "10.0.3.0/24"
+
+  db_name              = "${var.project_name}db"
+  db_username          = "admin"
+  db_password          = "admin12345"
 }
 
 # Passing project specific details for VPC
@@ -143,32 +147,39 @@ module "private_rds_sg" {
   }]
 }
 
+# Reference the RDS MariaDB module and pass necessary parameters
+module "rds" {
+  source                = "../../modules/rds"
+  project_name          = var.project_name
+  db_name               = local.db_name
+  db_username           = local.db_username
+  db_password           = local.db_password
+  private_subnet_ids    = [
+    module.private_subnet.subnets["${var.project_name}-private-subnet1"].id,
+    module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
+  ]
+  security_group_id     = module.private_rds_sg.sg_id
+}
+
 # Create EC2 Instances in Public and Private Subnets (Bastion & WordPress)
 module "ec2" {
   source = "../../modules/ec2"
   project_name = var.project_name
 
   # Network Subnets and Security Groups
-  public_subnet1_id = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
-  private_subnet1_id = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
-  private_subnet2_id = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
+  public_subnet1_id   = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
+  private_subnet1_id  = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
+  private_subnet2_id  = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
 
-  public_sg_id = module.public_sg.sg_id
-  private_sg_id = module.private_sg.sg_id
-}
+  public_sg_id        = module.public_sg.sg_id
+  private_sg_id       = module.private_sg.sg_id
 
-# Reference the RDS MariaDB module and pass necessary parameters
-module "rds" {
-  source                = "../../modules/rds"
-  project_name          = var.project_name
-  db_name               = "${var.project_name}db"
-  db_username           = "admin"
-  db_password           = "admin12345"
-  private_subnet_ids    = [
-    module.private_subnet.subnets["${var.project_name}-private-subnet1"].id,
-    module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
-  ]
-  security_group_id     = module.private_rds_sg.sg_id
+  db_name             = local.db_name
+  db_username         = local.db_username
+  db_password         = local.db_password
+  rds_endpoint        = module.rds.rds_instance_endpoint
+
+  depends_on          = [ module.rds ]
 }
 
 # Create Application Load Balancer

@@ -42,3 +42,23 @@ variable "project_name" {
   description = "Project name"
   type        = string
 }
+
+variable "db_name" {
+  description = "RDS Database endpoint"
+  type        = string
+}
+
+variable "db_username" {
+  description = "RDS Database endpoint"
+  type        = string
+}
+
+variable "db_password" {
+  description = "RDS Database endpoint"
+  type        = string
+}
+
+variable "rds_endpoint" {
+  description = "RDS Database endpoint"
+  type        = string
+}
