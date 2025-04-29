@@ -184,7 +184,7 @@ module "rds" {
 module "alb" {
   source            = "../../modules/alb"
   project_name      = var.project_name
-  security_group_id = module.public_lg_sg.sg_id
+  security_group_id = module.public_lb_sg.sg_id
   subnet_ids        = [
     module.public_subnet.subnets["${var.project_name}-public-subnet1"].id,
     module.public_subnet.subnets["${var.project_name}-public-subnet2"].id
