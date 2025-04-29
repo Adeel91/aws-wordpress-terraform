@@ -1,3 +1,15 @@
+locals {
+  public_subnet1_id   = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
+  public_subnet1_cidr = module.public_subnet.subnets["${var.project_name}-public-subnet1"].cidr # 10.0.0.0/24
+  public_subnet2_id   = module.public_subnet.subnets["${var.project_name}-public-subnet2"].id
+  public_subnet2_cidr = module.public_subnet.subnets["${var.project_name}-public-subnet2"].cidr # 10.0.2.0/24
+
+  private_subnet1_id   = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
+  private_subnet1_cidr = module.private_subnet.subnets["${var.project_name}-private-subnet1"].cidr # 10.0.1.0/24
+  private_subnet2_id   = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
+  private_subnet2_cidr = module.private_subnet.subnets["${var.project_name}-private-subnet2"].cidr # 10.0.3.0/24
+}
+
 # Passing project specific details for VPC
 module "vpc" {
   source   = "../../modules/vpc"
@@ -10,7 +22,7 @@ module "public_subnet" {
   vpc_id             = module.vpc.vpc_id
   project_name       = var.project_name
   subnet_name        = var.public_subnet_name
-  subnet_cidr_blocks = ["10.0.0.0/24", "10.0.2.0/24"]
+  subnet_cidr_blocks = [local.public_subnet1_cidr, local.public_subnet2_cidr]
   azs                = var.azs
   is_public          = true
   depends_on         = [module.vpc]
@@ -22,7 +34,7 @@ module "private_subnet" {
   vpc_id             = module.vpc.vpc_id
   project_name       = var.project_name
   subnet_name        = var.private_subnet_name
-  subnet_cidr_blocks = ["10.0.1.0/24", "10.0.3.0/24"]
+  subnet_cidr_blocks = [local.private_subnet1_cidr, local.private_subnet2_cidr]
   azs                = var.azs
   is_public          = false
   depends_on         = [module.vpc]
@@ -39,7 +51,7 @@ module "igw" {
 module "nat_gateway" {
   source           = "../../modules/natgw"
   project_name     = var.project_name
-  public_subnet_id = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id # Picking first public subnet to place the NAT
+  public_subnet_id = local.public_subnet1_id # Picking first public subnet to place the NAT
   create_eip       = true
   depends_on       = [module.public_subnet]
 }
@@ -73,37 +85,66 @@ module "private_rtb" {
 
 # Create Public Security Group for Bastion Host
 module "public_sg" {
-  source       = "../../modules/sg"
-  vpc_id       = module.vpc.vpc_id
-  project_name = var.project_name
-  subnet_cidr  = ["0.0.0.0/0"]
+  source        = "../../modules/sg"
+  vpc_id        = module.vpc.vpc_id
+  project_name  = var.project_name
+  sg_name       = "public-sg"
+  description   = "Allow SSH from anywhere"
+  ingress_rules = [{
+    description = "Allow SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }]
 }
 
 # Create Private Security Group for WordPress Instance
 module "private_sg" {
-  source              = "../../modules/sg"
-  vpc_id              = module.vpc.vpc_id
-  project_name        = var.project_name
-  subnet_cidr         = [module.public_subnet.subnets["${var.project_name}-public-subnet1"].cidr] # Only allow Bastion's Host subnet to SSH
+  source        = "../../modules/sg"
+  vpc_id        = module.vpc.vpc_id
+  project_name  = var.project_name
+  sg_name       = "private-sg"
+  description   = "Allow SSH from Bastion Host"
+  ingress_rules = [{
+    description = "SSH from Bastion"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [local.public_subnet1_cidr]
+  }]
 }
 
 # Create Public Security Group for ALB
-module "public_lg_sg" {
-  source              = "../../modules/sg"
-  vpc_id              = module.vpc.vpc_id
-  project_name        = var.project_name
-  subnet_cidr         = ["0.0.0.0/0"]
+module "public_lb_sg" {
+  source        = "../../modules/sg"
+  vpc_id        = module.vpc.vpc_id
+  project_name  = var.project_name
+  sg_name       = "alb-sg"
+  description   = "Allow HTTP from anywhere"
+  ingress_rules = [{
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }]
 }
 
 # Create Private Security Group for RDS Instance
 module "private_rds_sg" {
-  source              = "../../modules/sg"
-  vpc_id              = module.vpc.vpc_id
-  project_name        = var.project_name
-  subnet_cidr         = [
-    module.private_subnet.subnets["${var.project_name}-private-subnet1"].cidr,  # Subnet in AZ1
-    module.private_subnet.subnets["${var.project_name}-private-subnet2"].cidr   # Subnet in AZ2
-  ]
+  source        = "../../modules/sg"
+  vpc_id        = module.vpc.vpc_id
+  project_name  = var.project_name
+  sg_name       = "rds-sg"
+  description   = "Allow access to RDS from EC2"
+  ingress_rules = [{
+    description = "MySQL/Aurora"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = [local.private_subnet1_cidr, local.private_subnet2_cidr]
+  }]
 }
 
 # # Create Bastion Host in 1 of the public subnet
