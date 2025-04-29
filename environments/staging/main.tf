@@ -171,7 +171,7 @@ module "ec2_instances" {
 module "rds" {
   source                = "../../modules/rds"
   project_name          = var.project_name
-  db_name               = "aws-wordpress-terraform"
+  db_name               = "${var.project_name}db"
   db_username           = "root"
   db_password           = "root"
   private_subnet_ids    = [
