@@ -13,6 +13,10 @@ sudo yum install -y httpd php php-mysqlnd php-fpm php-xml php-mbstring wget unzi
 sudo systemctl start httpd
 sudo systemctl enable httpd
 
+# Start and enable PHP-FPM
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+
 # Download and extract WordPress
 wget https://wordpress.org/latest.tar.gz
 tar -xvzf latest.tar.gz
@@ -38,7 +42,19 @@ sudo sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', 'wordpress-m
 # Secure wp-config.php
 sudo chmod 640 wp-config.php
 
+# Configure Apache to use PHP-FPM (Ensure PHP-FPM is installed and running)
+echo '<IfModule mod_proxy_fcgi.c>
+  <FilesMatch \.php$>
+    SetHandler proxy:fcgi://127.0.0.1:9000
+  </FilesMatch>
+</IfModule>' | sudo tee /etc/httpd/conf.d/php-fpm.conf
+
 # Restart Apache to apply changes
 sudo systemctl restart httpd
 
+# Check for any errors
+sudo systemctl status httpd
+sudo systemctl status php-fpm
+
+# Final message
 echo "✅ WordPress is configured and connected to RDS MariaDB!"
