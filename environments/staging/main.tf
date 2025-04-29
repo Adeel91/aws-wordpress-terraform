@@ -154,7 +154,7 @@ module "private_rds_sg" {
 }
 
 # Create EC2 Instances in Public and Private Subnets (Bastion & WordPress)
-module "ec2_instances" {
+module "ec2" {
   source = "../../modules/ec2"
   project_name = var.project_name
 
@@ -190,6 +190,6 @@ module "alb" {
     module.public_subnet.subnets["${var.project_name}-public-subnet2"].id
   ]
   vpc_id            = module.vpc.vpc_id
-  wordpress_az1_id  = module.ec2_wordpress.ec2_instances["${var.project_name}-webserver-az1"].id
-  wordpress_az2_id  = module.ec2_wordpress.ec2_instances["${var.project_name}-webserver-az2"].id
+  wordpress_az1_id  = module.ec2.ec2_instances["${var.project_name}-webserver-az2"].id
+  wordpress_az2_id  = module.ec2.ec2_instances["${var.project_name}-webserver-az2"].id
 }
