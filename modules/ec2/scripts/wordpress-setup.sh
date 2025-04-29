@@ -6,8 +6,15 @@ set -e
 # Update system packages
 sudo yum update -y
 
-# Install necessary packages
-sudo yum install -y httpd php php-mysqlnd php-fpm php-xml php-mbstring wget unzip
+# Install EPEL and Remi repositories to get the latest PHP versions
+sudo yum install -y epel-release
+sudo yum install -y https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+
+# Enable the Remi PHP repository and install PHP 8.0
+sudo yum install -y yum-utils
+sudo yum module reset php
+sudo yum module enable php:remi-8.0  # Enabling PHP 8.0
+sudo yum install -y php php-cli php-fpm php-mysqlnd php-xml php-mbstring wget unzip
 
 # Start and enable Apache web server
 sudo systemctl start httpd
@@ -25,11 +32,12 @@ sudo mv wordpress/* /var/www/html/
 # Clean up the tar file
 rm -f latest.tar.gz
 
-# Set ownership and permissions
+# Set proper ownership and permissions
+# Ensure Apache can read/write to the WordPress directory
 sudo chown -R apache:apache /var/www/html/
 sudo chmod -R 755 /var/www/html/
 
-# Create wp-config.php and update DB connection details
+# Secure wp-config.php by setting appropriate permissions
 cd /var/www/html
 sudo cp wp-config-sample.php wp-config.php
 
