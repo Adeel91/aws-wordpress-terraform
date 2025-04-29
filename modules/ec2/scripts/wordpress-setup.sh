@@ -62,7 +62,7 @@ sudo sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', '$DB_HOST' )
 
 # Security hardening
 echo "Applying security settings..."
-sudo chmod 440 "$WEB_ROOT/wp-config.php"
+sudo chmod 644 "$WEB_ROOT/wp-config.php"
 # sudo setsebool -P httpd_unified 1  # Commented out if SELinux is disabled
 
 # Configure PHP-FPM with Apache
