@@ -1,7 +1,7 @@
 variable "aws_ami" {
   description = "Latest Amazon Linux 2 AMI"
-  type = string
-  default = "ami-0d61ea20f09848335"
+  type        = string
+  default     = "ami-0d61ea20f09848335"
 }
 
 variable "public_subnet1_id" {

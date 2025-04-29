@@ -33,7 +33,7 @@ locals {
       key_name                    = var.key_name
       user_data                   = data.template_file.wordpress_setup.rendered
       tags                        = { Name = "${var.project_name}-webserver-az1" }
-      root_block_device           = [{
+      root_block_device = [{
         volume_size = 8
         volume_type = "gp2"
         encrypted   = true
@@ -49,7 +49,7 @@ locals {
       key_name                    = var.key_name
       user_data                   = data.template_file.wordpress_setup.rendered
       tags                        = { Name = "${var.project_name}-webserver-az2" }
-      root_block_device           = [{
+      root_block_device = [{
         volume_size = 8
         volume_type = "gp2"
         encrypted   = true

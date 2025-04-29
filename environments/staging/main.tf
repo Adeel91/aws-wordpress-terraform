@@ -5,9 +5,9 @@ locals {
   private_subnet1_cidr = "10.0.1.0/24"
   private_subnet2_cidr = "10.0.3.0/24"
 
-  db_name              = "${var.project_name}db"
-  db_username          = "admin"
-  db_password          = "admin12345"
+  db_name     = "${var.project_name}db"
+  db_username = "admin"
+  db_password = "admin12345"
 }
 
 # Passing project specific details for VPC
@@ -61,20 +61,20 @@ module "public_rtb" {
   source       = "../../modules/rtb"
   vpc_id       = module.vpc.vpc_id
   project_name = var.project_name
-  subnet_ids   = {
+  subnet_ids = {
     for subnet_name, subnet_info in module.public_subnet.subnets :
     subnet_name => subnet_info.id
   }
-  is_public    = true
-  igw_id       = module.igw.igw_id
-  depends_on   = [module.igw]
+  is_public  = true
+  igw_id     = module.igw.igw_id
+  depends_on = [module.igw]
 }
 
 # Private Route Table
 module "private_rtb" {
-  source         = "../../modules/rtb"
-  vpc_id         = module.vpc.vpc_id
-  project_name   = var.project_name
+  source       = "../../modules/rtb"
+  vpc_id       = module.vpc.vpc_id
+  project_name = var.project_name
   subnet_ids = {
     for subnet_name, subnet_info in module.private_subnet.subnets :
     subnet_name => subnet_info.id
@@ -85,11 +85,11 @@ module "private_rtb" {
 
 # Create Public Security Group for Bastion Host
 module "public_sg" {
-  source        = "../../modules/sg"
-  vpc_id        = module.vpc.vpc_id
-  project_name  = var.project_name
-  sg_name       = "public-sg"
-  description   = "Allow SSH from anywhere"
+  source       = "../../modules/sg"
+  vpc_id       = module.vpc.vpc_id
+  project_name = var.project_name
+  sg_name      = "public-sg"
+  description  = "Allow SSH from anywhere"
   ingress_rules = [{
     description = "Allow SSH"
     from_port   = 22
@@ -101,11 +101,11 @@ module "public_sg" {
 
 # Create Private Security Group for WordPress Instance
 module "private_sg" {
-  source        = "../../modules/sg"
-  vpc_id        = module.vpc.vpc_id
-  project_name  = var.project_name
-  sg_name       = "private-sg"
-  description   = "Allow SSH from Bastion Host"
+  source       = "../../modules/sg"
+  vpc_id       = module.vpc.vpc_id
+  project_name = var.project_name
+  sg_name      = "private-sg"
+  description  = "Allow SSH from Bastion Host"
   ingress_rules = [{
     description = "SSH from Bastion"
     from_port   = 22
@@ -117,11 +117,11 @@ module "private_sg" {
 
 # Create Public Security Group for ALB
 module "public_lb_sg" {
-  source        = "../../modules/sg"
-  vpc_id        = module.vpc.vpc_id
-  project_name  = var.project_name
-  sg_name       = "alb-sg"
-  description   = "Allow HTTP from anywhere"
+  source       = "../../modules/sg"
+  vpc_id       = module.vpc.vpc_id
+  project_name = var.project_name
+  sg_name      = "alb-sg"
+  description  = "Allow HTTP from anywhere"
   ingress_rules = [{
     description = "HTTP"
     from_port   = 80
@@ -133,11 +133,11 @@ module "public_lb_sg" {
 
 # Create Private Security Group for RDS Instance
 module "private_rds_sg" {
-  source        = "../../modules/sg"
-  vpc_id        = module.vpc.vpc_id
-  project_name  = var.project_name
-  sg_name       = "rds-sg"
-  description   = "Allow access to RDS from EC2"
+  source       = "../../modules/sg"
+  vpc_id       = module.vpc.vpc_id
+  project_name = var.project_name
+  sg_name      = "rds-sg"
+  description  = "Allow access to RDS from EC2"
   ingress_rules = [{
     description = "MySQL/Aurora"
     from_port   = 3306
@@ -149,37 +149,37 @@ module "private_rds_sg" {
 
 # Reference the RDS MariaDB module and pass necessary parameters
 module "rds" {
-  source                = "../../modules/rds"
-  project_name          = var.project_name
-  db_name               = local.db_name
-  db_username           = local.db_username
-  db_password           = local.db_password
-  private_subnet_ids    = [
+  source       = "../../modules/rds"
+  project_name = var.project_name
+  db_name      = local.db_name
+  db_username  = local.db_username
+  db_password  = local.db_password
+  private_subnet_ids = [
     module.private_subnet.subnets["${var.project_name}-private-subnet1"].id,
     module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
   ]
-  security_group_id     = module.private_rds_sg.sg_id
+  security_group_id = module.private_rds_sg.sg_id
 }
 
 # Create EC2 Instances in Public and Private Subnets (Bastion & WordPress)
 module "ec2" {
-  source = "../../modules/ec2"
+  source       = "../../modules/ec2"
   project_name = var.project_name
 
   # Network Subnets and Security Groups
-  public_subnet1_id   = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
-  private_subnet1_id  = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
-  private_subnet2_id  = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
+  public_subnet1_id  = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
+  private_subnet1_id = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
+  private_subnet2_id = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
 
-  public_sg_id        = module.public_sg.sg_id
-  private_sg_id       = module.private_sg.sg_id
+  public_sg_id  = module.public_sg.sg_id
+  private_sg_id = module.private_sg.sg_id
 
-  db_name             = local.db_name
-  db_username         = local.db_username
-  db_password         = local.db_password
-  rds_endpoint        = module.rds.rds_instance_endpoint
+  db_name      = local.db_name
+  db_username  = local.db_username
+  db_password  = local.db_password
+  rds_endpoint = module.rds.rds_instance_endpoint
 
-  depends_on          = [ module.rds ]
+  depends_on = [module.rds]
 }
 
 # Create Application Load Balancer
@@ -187,12 +187,12 @@ module "alb" {
   source            = "../../modules/alb"
   project_name      = var.project_name
   security_group_id = module.public_lb_sg.sg_id
-  subnet_ids        = [
+  subnet_ids = [
     module.public_subnet.subnets["${var.project_name}-public-subnet1"].id,
     module.public_subnet.subnets["${var.project_name}-public-subnet2"].id
   ]
-  vpc_id            = module.vpc.vpc_id
-  wordpress_az1_id  = module.ec2.ec2_instances["${var.project_name}-webserver-az1"].id
-  wordpress_az2_id  = module.ec2.ec2_instances["${var.project_name}-webserver-az2"].id
-  depends_on        = [module.ec2]
+  vpc_id           = module.vpc.vpc_id
+  wordpress_az1_id = module.ec2.ec2_instances["${var.project_name}-webserver-az1"].id
+  wordpress_az2_id = module.ec2.ec2_instances["${var.project_name}-webserver-az2"].id
+  depends_on       = [module.ec2]
 }
