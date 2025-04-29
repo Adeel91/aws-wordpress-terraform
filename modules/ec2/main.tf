@@ -1,16 +1,11 @@
-data "template_file" "wordpress_setup" {
-  template = file("${path.module}/scripts/wordpress-setup.sh")
-
-  # Pass the dynamic variables to the template
-  vars = {
-    DB_HOST = "${var.rds_endpoint}"
-    DB_NAME = "${var.db_name}"
-    DB_USER = "${var.db_username}"
-    DB_PASS = "${var.db_password}"
-  }
-}
-
 locals {
+  wordpress_setup_script = templatefile("${path.module}/scripts/wordpress-setup.sh", {
+    DB_HOST = var.rds_endpoint
+    DB_NAME = var.db_name
+    DB_USER = var.db_username
+    DB_PASS = var.db_password
+  })
+
   instances = [
     {
       name                        = "bastion-host"
@@ -31,7 +26,7 @@ locals {
       security_group_ids          = [var.private_sg_id]
       associate_public_ip_address = false
       key_name                    = var.key_name
-      user_data                   = data.template_file.wordpress_setup.rendered
+      user_data                   = local.wordpress_setup_script
       tags                        = { Name = "${var.project_name}-webserver-az1" }
       root_block_device = [{
         volume_size = 8
@@ -47,7 +42,7 @@ locals {
       security_group_ids          = [var.private_sg_id]
       associate_public_ip_address = false
       key_name                    = var.key_name
-      user_data                   = data.template_file.wordpress_setup.rendered
+      user_data                   = local.wordpress_setup_script
       tags                        = { Name = "${var.project_name}-webserver-az2" }
       root_block_device = [{
         volume_size = 8
