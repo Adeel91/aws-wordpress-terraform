@@ -1,4 +1,4 @@
-resource "aws_db_instance" "mariadb_instance" {
+resource "aws_db_instance" "this" {
   identifier              = "${var.project_name}-mariadb"
   engine                  = "mariadb"
   engine_version          = "10.5"
@@ -10,7 +10,7 @@ resource "aws_db_instance" "mariadb_instance" {
   password                = var.db_password
   multi_az                = true  # Multi-AZ enabled for high availability
   vpc_security_group_ids  = [var.security_group_id]
-  db_subnet_group_name    = var.db_subnet_group_name  # Reference to the subnet group
+  db_subnet_group_name    = aws_db_subnet_group.mariadb.name  # Reference to the subnet group
   publicly_accessible     = false  # RDS should not be publicly accessible
 
   tags = {
@@ -18,4 +18,13 @@ resource "aws_db_instance" "mariadb_instance" {
   }
 
   final_snapshot_identifier = "${var.project_name}-final-snapshot"
+}
+
+resource "aws_db_subnet_group" "mariadb" {
+  name       = "${var.project_name}-mariadb-subnet-group"
+  subnet_ids = var.private_subnet_ids
+
+  tags = {
+    Name = "${var.project_name}-mariadb-subnet-group"
+  }
 }

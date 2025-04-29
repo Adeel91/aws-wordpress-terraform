@@ -28,8 +28,3 @@ variable "security_group_id" {
   description = "The security group ID for the RDS instance"
   type        = string
 }
-
-variable "db_subnet_group_name" {
-  description = "The name of the DB subnet group"
-  type        = string
-}

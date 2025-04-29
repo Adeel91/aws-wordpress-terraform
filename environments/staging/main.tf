@@ -167,46 +167,19 @@ module "ec2_instances" {
   private_sg_id = module.private_sg.sg_id
 }
 
-############################################################################
-# # Create Bastion Host in 1 of the public subnet
-# module "ec2_bastion_host" {
-#   source                 = "../../modules/ec2"
-#   public_subnet_cidr_az1 = module.public_subnet.subnets["${var.project_name}-public-subnet1"].cidr # this is the first public subnet in the list of AZ1 public subnet
-#   project_name           = var.project_name
-#   security_group_id      = module.public_sg.sg_id
-#   depends_on             = [module.private_sg]
-# }
-
-# # Create WordPress Instance in 1 of the private subnet
-# module "ec2_wordpress_az1" {
-#   source                  = "../../modules/ec2"
-#   private_subnet_cidr_az1 = module.private_subnet.subnets["${var.project_name}-private-subnet1"].cidr # this is the first private subnet in the list of AZ1 private subnet
-#   project_name            = var.project_name
-#   security_group_id       = module.private_sg.sg_id
-#   depends_on              = [module.private_sg]
-# }
-
-# # Create WordPress Instance in second of the private subnet
-# module "ec2_wordpress_az2" {
-#   source                  = "../../modules/ec2"
-#   private_subnet_cidr_az2 = module.private_subnet.subnets["${var.project_name}-private-subnet2"].cidr # this is the second private subnet in the list of AZ2 private subnet
-#   project_name            = var.project_name
-#   security_group_id       = module.private_sg.sg_id
-#   depends_on              = [module.private_sg]
-# }
-############################################################################
-
-# # Reference the RDS MariaDB module and pass necessary parameters
-# module "rds" {
-#   source                = "../../modules/rds"
-#   project_name          = var.project_name
-#   db_name               = "aws-wordpress-terraform"
-#   db_username           = "root"
-#   db_password           = "root"
-#   private_subnet_ids    = [module.private_subnet.subnets["${var.project_name}-private-subnet1"].cidr, module.private_subnet.subnets["${var.project_name}-private-subnet2"].cidr]
-#   security_group_id     = module.private_rds_sg.private_rds_sg_id
-#   db_subnet_group_name  = "${var.project_name}-mariadb-subnet-group"
-# }
+# Reference the RDS MariaDB module and pass necessary parameters
+module "rds" {
+  source                = "../../modules/rds"
+  project_name          = var.project_name
+  db_name               = "aws-wordpress-terraform"
+  db_username           = "root"
+  db_password           = "root"
+  private_subnet_ids    = [
+    module.private_subnet.subnets["${var.project_name}-private-subnet1"].id,
+    module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
+  ]
+  security_group_id     = module.private_rds_sg.sg_id
+}
 
 # module "alb" {
 #   source            = "../../modules/alb"
