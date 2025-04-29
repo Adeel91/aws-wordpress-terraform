@@ -181,12 +181,15 @@ module "rds" {
   security_group_id     = module.private_rds_sg.sg_id
 }
 
-# module "alb" {
-#   source            = "../../modules/alb"
-#   project_name      = var.project_name
-#   security_group_id = module.public_lg_sg.public_lb_sg_id
-#   subnet_ids        = [module.public_subnet.subnets["${var.project_name}-public-subnet1"].cidr, module.public_subnet.subnets["${var.project_name}-public-subnet2"].cidr] # Use the public subnets in AZ1 and AZ2
-#   vpc_id            = module.vpc.vpc_id
-#   wordpress_az1_id  = module.ec2_wordpress_az1.ec2_wordpress_az1_id
-#   wordpress_az2_id  = module.ec2_wordpress_az2.ec2_wordpress_az2_id
-# }
+module "alb" {
+  source            = "../../modules/alb"
+  project_name      = var.project_name
+  security_group_id = module.public_lg_sg.sg_id
+  subnet_ids        = [
+    module.public_subnet.subnets["${var.project_name}-public-subnet1"].id,
+    module.public_subnet.subnets["${var.project_name}-public-subnet2"].id
+  ]
+  vpc_id            = module.vpc.vpc_id
+  wordpress_az1_id  = module.ec2_wordpress.ec2_instances["${var.project_name}-webserver-az1"].id
+  wordpress_az2_id  = module.ec2_wordpress.ec2_instances["${var.project_name}-webserver-az2"].id
+}

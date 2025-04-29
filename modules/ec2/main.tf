@@ -20,7 +20,7 @@ locals {
       associate_public_ip_address = false
       key_name                    = var.key_name
       user_data                   = file("${path.module}/scripts/wordpress-setup.sh")
-      tags                        = { Name = "${var.project_name}-wordpress-az1" }
+      tags                        = { Name = "${var.project_name}-webserver-az1" }
       root_block_device           = [{
         volume_size = 20
         volume_type = "gp2"
@@ -36,7 +36,7 @@ locals {
       associate_public_ip_address = false
       key_name                    = var.key_name
       user_data                   = file("${path.module}/scripts/wordpress-setup.sh")
-      tags                        = { Name = "${var.project_name}-wordpress-az2" }
+      tags                        = { Name = "${var.project_name}-webserver-az2" }
       root_block_device           = [{
         volume_size = 20
         volume_type = "gp2"
