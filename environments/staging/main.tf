@@ -4,16 +4,6 @@ locals {
 
   private_subnet1_cidr = "10.0.1.0/24"
   private_subnet2_cidr = "10.0.3.0/24"
-  
-  # public_subnet1_id   = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
-  # public_subnet1_cidr = module.public_subnet.subnets["${var.project_name}-public-subnet1"].cidr # 10.0.0.0/24
-  # public_subnet2_id   = module.public_subnet.subnets["${var.project_name}-public-subnet2"].id
-  # public_subnet2_cidr = module.public_subnet.subnets["${var.project_name}-public-subnet2"].cidr # 10.0.2.0/24
-
-  # private_subnet1_id   = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
-  # private_subnet1_cidr = module.private_subnet.subnets["${var.project_name}-private-subnet1"].cidr # 10.0.1.0/24
-  # private_subnet2_id   = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
-  # private_subnet2_cidr = module.private_subnet.subnets["${var.project_name}-private-subnet2"].cidr # 10.0.3.0/24
 }
 
 # Passing project specific details for VPC
@@ -181,6 +171,7 @@ module "rds" {
   security_group_id     = module.private_rds_sg.sg_id
 }
 
+# Create Application Load Balancer
 module "alb" {
   source            = "../../modules/alb"
   project_name      = var.project_name
@@ -192,4 +183,5 @@ module "alb" {
   vpc_id            = module.vpc.vpc_id
   wordpress_az1_id  = module.ec2.ec2_instances["${var.project_name}-webserver-az2"].id
   wordpress_az2_id  = module.ec2.ec2_instances["${var.project_name}-webserver-az2"].id
+  depends_on        = [module.ec2]
 }
