@@ -3,10 +3,10 @@ data "template_file" "wordpress_setup" {
 
   # Pass the dynamic variables to the template
   vars = {
-    DB_HOST = var.rds_endpoint
-    DB_NAME = var.db_name
-    DB_USER = var.db_username
-    DB_PASS = var.db_password
+    DB_HOST = "${var.rds_endpoint}"
+    DB_NAME = "${var.db_name}"
+    DB_USER = "${var.db_username}"
+    DB_PASS = "${var.db_password}"
   }
 }
 
