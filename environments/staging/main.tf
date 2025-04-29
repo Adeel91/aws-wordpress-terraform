@@ -1,13 +1,19 @@
 locals {
-  public_subnet1_id   = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
-  public_subnet1_cidr = module.public_subnet.subnets["${var.project_name}-public-subnet1"].cidr # 10.0.0.0/24
-  public_subnet2_id   = module.public_subnet.subnets["${var.project_name}-public-subnet2"].id
-  public_subnet2_cidr = module.public_subnet.subnets["${var.project_name}-public-subnet2"].cidr # 10.0.2.0/24
+  public_subnet1_cidr = "10.0.0.0/24"
+  public_subnet2_cidr = "10.0.2.0/24"
 
-  private_subnet1_id   = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
-  private_subnet1_cidr = module.private_subnet.subnets["${var.project_name}-private-subnet1"].cidr # 10.0.1.0/24
-  private_subnet2_id   = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
-  private_subnet2_cidr = module.private_subnet.subnets["${var.project_name}-private-subnet2"].cidr # 10.0.3.0/24
+  private_subnet1_cidr = "10.0.1.0/24"
+  private_subnet2_cidr = "10.0.3.0/24"
+  
+  # public_subnet1_id   = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
+  # public_subnet1_cidr = module.public_subnet.subnets["${var.project_name}-public-subnet1"].cidr # 10.0.0.0/24
+  # public_subnet2_id   = module.public_subnet.subnets["${var.project_name}-public-subnet2"].id
+  # public_subnet2_cidr = module.public_subnet.subnets["${var.project_name}-public-subnet2"].cidr # 10.0.2.0/24
+
+  # private_subnet1_id   = module.private_subnet.subnets["${var.project_name}-private-subnet1"].id
+  # private_subnet1_cidr = module.private_subnet.subnets["${var.project_name}-private-subnet1"].cidr # 10.0.1.0/24
+  # private_subnet2_id   = module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
+  # private_subnet2_cidr = module.private_subnet.subnets["${var.project_name}-private-subnet2"].cidr # 10.0.3.0/24
 }
 
 # Passing project specific details for VPC
@@ -51,7 +57,7 @@ module "igw" {
 module "nat_gateway" {
   source           = "../../modules/natgw"
   project_name     = var.project_name
-  public_subnet_id = local.public_subnet1_id # Picking first public subnet to place the NAT
+  public_subnet_id = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id # Picking first public subnet to place the NAT
   create_eip       = true
   depends_on       = [module.public_subnet]
 }
