@@ -143,11 +143,11 @@ module "private_rds_sg" {
   sg_name      = "rds-sg"
   description  = "Allow access to RDS from EC2"
   ingress_rules = [{
-    description = "MySQL/Aurora"
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = [module.private_sg.sg_id]
+    description              = "MySQL/Aurora"
+    from_port                = 3306
+    to_port                  = 3306
+    protocol                 = "tcp"
+    source_security_group_id = module.private_sg.sg_id
   }]
 }
 
