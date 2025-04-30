@@ -1,7 +1,11 @@
 variable "aws_ami" {
   description = "Latest Amazon Linux 2 AMI"
   type        = string
-  default     = "ami-0d61ea20f09848335"
+}
+
+variable "instance_type" {
+  description = "EC2 machine instance type"
+  type        = string
 }
 
 variable "public_subnet1_id" {
@@ -35,7 +39,6 @@ variable "private_sg_id" {
 variable "key_name" {
   description = "The SSH key name for EC2 instances"
   type        = string
-  default     = "vockey"
 }
 
 variable "project_name" {

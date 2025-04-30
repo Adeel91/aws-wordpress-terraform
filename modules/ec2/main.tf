@@ -1,27 +1,27 @@
 locals {
-  wordpress_setup_script = templatefile("${path.module}/scripts/wordpress-setup.sh", {
+  wordpress_setup_script = base64encode(templatefile("${path.root}/scripts/wordpress-setup.sh", {
     DB_HOST = var.rds_endpoint
     DB_NAME = var.db_name
     DB_USER = var.db_username
     DB_PASS = var.db_password
-  })
+  }))
 
   instances = [
     {
       name                        = "bastion-host"
       ami                         = var.aws_ami
-      instance_type               = "t2.micro"
+      instance_type               = var.instance_type
       subnet_id                   = var.public_subnet1_id
       security_group_ids          = [var.public_sg_id]
       associate_public_ip_address = true
       key_name                    = var.key_name
-      user_data                   = file("${path.module}/scripts/bastion-setup.sh")
+      user_data                   = file("${path.root}/scripts/bastion-setup.sh")
       tags                        = { Name = "${var.project_name}-bastion" }
     },
     {
       name                        = "wordpress-webserver-az1"
       ami                         = var.aws_ami
-      instance_type               = "t2.micro"
+      instance_type               = var.instance_type
       subnet_id                   = var.private_subnet1_id
       security_group_ids          = [var.private_sg_id]
       associate_public_ip_address = false
@@ -37,7 +37,7 @@ locals {
     {
       name                        = "wordpress-webserver-az2"
       ami                         = var.aws_ami
-      instance_type               = "t2.micro"
+      instance_type               = var.instance_type
       subnet_id                   = var.private_subnet2_id
       security_group_ids          = [var.private_sg_id]
       associate_public_ip_address = false

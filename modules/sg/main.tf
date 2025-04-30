@@ -3,25 +3,31 @@ resource "aws_security_group" "this" {
   description = var.description
   vpc_id      = var.vpc_id
 
-  dynamic "ingress" {
-    for_each = var.ingress_rules
-    content {
-      description = ingress.value.description
-      from_port   = ingress.value.from_port
-      to_port     = ingress.value.to_port
-      protocol    = ingress.value.protocol
-      cidr_blocks = ingress.value.cidr_blocks
-    }
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name = "${var.project_name}-${var.sg_name}"
   }
+}
+
+resource "aws_security_group_rule" "ingress" {
+  for_each = {
+    for idx, rule in var.ingress_rules :
+    "${idx}" => rule
+  }
+
+  type              = "ingress"
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  cidr_blocks       = each.value.cidr_blocks
+  description       = each.value.description
+  security_group_id = aws_security_group.this.id
+}
+
+resource "aws_security_group_rule" "egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.this.id
 }

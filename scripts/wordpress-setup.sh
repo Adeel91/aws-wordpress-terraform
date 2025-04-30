@@ -3,10 +3,10 @@
 # Configuration Variables
 WEB_ROOT="/var/www/html"
 LOG_FILE="/var/log/wordpress-setup.log"
-DB_NAME="$$DB_NAME:-wordpressdb"
-DB_USER="$$DB_USER:-admin"
-DB_PASS="$$DB_PASS:-admin123"
-DB_HOST="$$DB_HOST:-localhost"
+DB_NAME="${DB_NAME:-db}"
+DB_USER="${DB_USER:-admin}"
+DB_PASS="${DB_PASS:-admin123}"
+DB_HOST="${DB_HOST:-localhost}"
 
 # Initialize logging
 exec > >(tee -a "$LOG_FILE") 2>&1
@@ -25,6 +25,10 @@ echo "Configuring PHP 8.1..."
 sudo amazon-linux-extras enable php8.1 -y
 sudo yum clean metadata
 sudo yum install -y php php-cli php-mysqlnd php-fpm php-xml php-mbstring php-opcache php-gd
+
+# Enable and install MariaDB client
+echo "Configuring MariaDB..."
+sudo yum install mariadb -y
 
 # Install and configure Apache
 echo "Installing Apache..."

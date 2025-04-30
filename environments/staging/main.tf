@@ -1,4 +1,8 @@
 locals {
+  aws_ami       = "ami-0d61ea20f09848335"
+  pem_key       = "vockey"
+  instance_type = "t2.micro"
+
   public_subnet1_cidr = "10.0.0.0/24"
   public_subnet2_cidr = "10.0.2.0/24"
 
@@ -143,7 +147,7 @@ module "private_rds_sg" {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = [local.private_subnet1_cidr, local.private_subnet2_cidr]
+    cidr_blocks = [module.private_sg.sg_id]
   }]
 }
 
@@ -163,8 +167,11 @@ module "rds" {
 
 # Create EC2 Instances in Public and Private Subnets (Bastion & WordPress)
 module "ec2" {
-  source       = "../../modules/ec2"
-  project_name = var.project_name
+  source        = "../../modules/ec2"
+  project_name  = var.project_name
+  aws_ami       = local.aws_ami
+  key_name      = local.pem_key
+  instance_type = local.instance_type
 
   # Network Subnets and Security Groups
   public_subnet1_id  = module.public_subnet.subnets["${var.project_name}-public-subnet1"].id
@@ -182,6 +189,7 @@ module "ec2" {
   depends_on = [module.rds]
 }
 
+
 # Create Application Load Balancer
 module "alb" {
   source            = "../../modules/alb"
@@ -196,3 +204,26 @@ module "alb" {
   wordpress_az2_id = module.ec2.ec2_instances["${var.project_name}-webserver-az2"].id
   depends_on       = [module.ec2]
 }
+
+# module "asg" {
+#   source        = "../../modules/asg"
+#   project_name  = var.project_name
+#   ami_id        = local.aws_ami
+#   instance_type = local.instance_type
+#   key_name      = local.pem_key
+
+#   private_sg_id = module.private_sg.sg_id
+
+#   private_subnet_ids = [
+#     module.private_subnet.subnets["${var.project_name}-private-subnet1"].id,
+#     module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
+#   ]
+
+#   target_group_arn = module.alb.target_group_arn
+
+#   min_size         = 2
+#   max_size         = 4
+#   desired_capacity = 2
+
+#   depends_on = [module.alb]
+# }
