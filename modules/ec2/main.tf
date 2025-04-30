@@ -1,9 +1,9 @@
 locals {
   wordpress_setup_script = base64encode(templatefile("${path.root}/scripts/wordpress-setup.sh", {
-    DB_HOST = var.rds_endpoint
-    DB_NAME = var.db_name
-    DB_USER = var.db_username
-    DB_PASS = var.db_password
+    DB_HOST = var.rds_endpoint != "" ? var.rds_endpoint : "localhost"
+    DB_NAME = var.db_name != "" ? var.db_name : "db"
+    DB_USER = var.db_username != "" ? var.db_username : "admin"
+    DB_PASS = var.db_password != "" ? var.db_password : "admin123"
   }))
 
   instances = [
