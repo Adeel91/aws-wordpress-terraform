@@ -45,14 +45,15 @@ resource "aws_lb_listener" "http_listener" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "wordpress_targets_az1" {
-  target_group_arn = aws_lb_target_group.target_group.arn
-  target_id        = var.wordpress_az1_id # Attach first WordPress instance
-  port             = 80
-}
+# No more direct referencing for wordpress as Autoscaling group is in place
+# resource "aws_lb_target_group_attachment" "wordpress_targets_az1" {
+#   target_group_arn = aws_lb_target_group.target_group.arn
+#   target_id        = var.wordpress_az1_id # Attach first WordPress instance
+#   port             = 80
+# }
 
-resource "aws_lb_target_group_attachment" "wordpress_targets_az2" {
-  target_group_arn = aws_lb_target_group.target_group.arn
-  target_id        = var.wordpress_az2_id # Attach second WordPress instance
-  port             = 80
-}
+# resource "aws_lb_target_group_attachment" "wordpress_targets_az2" {
+#   target_group_arn = aws_lb_target_group.target_group.arn
+#   target_id        = var.wordpress_az2_id # Attach second WordPress instance
+#   port             = 80
+# }

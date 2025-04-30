@@ -21,9 +21,11 @@ variable "vpc_id" {
 variable "wordpress_az1_id" {
   description = "Instance ID of the WordPress EC2 instance in AZ1"
   type        = string
+  default     = null
 }
 
 variable "wordpress_az2_id" {
   description = "Instance ID of the WordPress EC2 instance in AZ2"
   type        = string
+  default     = null
 }
