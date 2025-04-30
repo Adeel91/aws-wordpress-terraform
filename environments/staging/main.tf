@@ -1,5 +1,5 @@
 locals {
-  aws_ami       = "ami-0d61ea20f09848335"
+  aws_ami       = "ami-05572e392e80aee89" # Amazon Linux 2023 AMI ID
   pem_key       = "vockey"
   instance_type = "t2.micro"
 
@@ -205,25 +205,30 @@ module "alb" {
   depends_on       = [module.ec2]
 }
 
-# module "asg" {
-#   source        = "../../modules/asg"
-#   project_name  = var.project_name
-#   ami_id        = local.aws_ami
-#   instance_type = local.instance_type
-#   key_name      = local.pem_key
+module "asg" {
+  source        = "../../modules/asg"
+  project_name  = var.project_name
+  ami_id        = local.aws_ami
+  instance_type = local.instance_type
+  key_name      = local.pem_key
 
-#   private_sg_id = module.private_sg.sg_id
+  db_name      = local.db_name
+  db_username  = local.db_username
+  db_password  = local.db_password
+  rds_endpoint = module.rds.rds_instance_endpoint
 
-#   private_subnet_ids = [
-#     module.private_subnet.subnets["${var.project_name}-private-subnet1"].id,
-#     module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
-#   ]
+  private_sg_id = module.private_sg.sg_id
 
-#   target_group_arn = module.alb.target_group_arn
+  private_subnet_ids = [
+    module.private_subnet.subnets["${var.project_name}-private-subnet1"].id,
+    module.private_subnet.subnets["${var.project_name}-private-subnet2"].id
+  ]
 
-#   min_size         = 2
-#   max_size         = 4
-#   desired_capacity = 2
+  target_group_arn = module.alb.target_group_arn
 
-#   depends_on = [module.alb]
-# }
+  min_size         = 2
+  max_size         = 4
+  desired_capacity = 2
+
+  depends_on = [module.alb]
+}

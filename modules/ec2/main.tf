@@ -1,10 +1,11 @@
+# WordPress instances are now handled by Autoscaling Group
 locals {
-  wordpress_setup_script = base64encode(templatefile("${path.root}/scripts/wordpress-setup.sh", {
-    DB_HOST = var.rds_endpoint != "" ? var.rds_endpoint : "localhost"
-    DB_NAME = var.db_name != "" ? var.db_name : "db"
-    DB_USER = var.db_username != "" ? var.db_username : "admin"
-    DB_PASS = var.db_password != "" ? var.db_password : "admin123"
-  }))
+  # wordpress_setup_script = base64encode(templatefile("${path.root}/scripts/wordpress-setup.sh.tpl", {
+  #   DB_HOST = var.rds_endpoint != "" ? var.rds_endpoint : "localhost"
+  #   DB_NAME = var.db_name != "" ? var.db_name : "db"
+  #   DB_USER = var.db_username != "" ? var.db_username : "admin"
+  #   DB_PASS = var.db_password != "" ? var.db_password : "admin123"
+  # }))
 
   instances = [
     {
@@ -15,41 +16,41 @@ locals {
       security_group_ids          = [var.public_sg_id]
       associate_public_ip_address = true
       key_name                    = var.key_name
-      user_data                   = file("${path.root}/scripts/bastion-setup.sh")
+      user_data                   = file("${path.root}/scripts/bastion-setup.sh.tpl")
       tags                        = { Name = "${var.project_name}-bastion" }
     },
-    {
-      name                        = "wordpress-webserver-az1"
-      ami                         = var.aws_ami
-      instance_type               = var.instance_type
-      subnet_id                   = var.private_subnet1_id
-      security_group_ids          = [var.private_sg_id]
-      associate_public_ip_address = false
-      key_name                    = var.key_name
-      user_data                   = local.wordpress_setup_script
-      tags                        = { Name = "${var.project_name}-webserver-az1" }
-      root_block_device = [{
-        volume_size = 8
-        volume_type = "gp2"
-        encrypted   = true
-      }]
-    },
-    {
-      name                        = "wordpress-webserver-az2"
-      ami                         = var.aws_ami
-      instance_type               = var.instance_type
-      subnet_id                   = var.private_subnet2_id
-      security_group_ids          = [var.private_sg_id]
-      associate_public_ip_address = false
-      key_name                    = var.key_name
-      user_data                   = local.wordpress_setup_script
-      tags                        = { Name = "${var.project_name}-webserver-az2" }
-      root_block_device = [{
-        volume_size = 8
-        volume_type = "gp2"
-        encrypted   = true
-      }]
-    }
+    # {
+    #   name                        = "wordpress-webserver-az1"
+    #   ami                         = var.aws_ami
+    #   instance_type               = var.instance_type
+    #   subnet_id                   = var.private_subnet1_id
+    #   security_group_ids          = [var.private_sg_id]
+    #   associate_public_ip_address = false
+    #   key_name                    = var.key_name
+    #   user_data                   = local.wordpress_setup_script
+    #   tags                        = { Name = "${var.project_name}-webserver-az1" }
+    #   root_block_device = [{
+    #     volume_size = 8
+    #     volume_type = "gp2"
+    #     encrypted   = true
+    #   }]
+    # },
+    # {
+    #   name                        = "wordpress-webserver-az2"
+    #   ami                         = var.aws_ami
+    #   instance_type               = var.instance_type
+    #   subnet_id                   = var.private_subnet2_id
+    #   security_group_ids          = [var.private_sg_id]
+    #   associate_public_ip_address = false
+    #   key_name                    = var.key_name
+    #   user_data                   = local.wordpress_setup_script
+    #   tags                        = { Name = "${var.project_name}-webserver-az2" }
+    #   root_block_device = [{
+    #     volume_size = 8
+    #     volume_type = "gp2"
+    #     encrypted   = true
+    #   }]
+    # }
   ]
 }
 

@@ -17,7 +17,7 @@ resource "aws_db_instance" "this" {
     Name = "${var.project_name}-mariadb"
   }
 
-  final_snapshot_identifier = "${var.project_name}-final-snapshot"
+  backup_retention_period = 0
 }
 
 resource "aws_db_subnet_group" "mariadb" {
