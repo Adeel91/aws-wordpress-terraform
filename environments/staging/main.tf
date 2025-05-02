@@ -120,22 +120,6 @@ module "public_sg" {
   }]
 }
 
-# Create Private Security Group for WordPress Instance
-module "private_sg" {
-  source       = "../../modules/sg"
-  vpc_id       = module.vpc.vpc_id
-  project_name = var.project_name
-  sg_name      = "private-sg"
-  description  = "Allow SSH from Bastion Host"
-  ingress_rules = [{
-    description = "SSH from Bastion"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [local.public_subnet1_cidr]
-  }]
-}
-
 # Create Public Security Group for ALB
 module "public_lb_sg" {
   source       = "../../modules/sg"
@@ -150,6 +134,24 @@ module "public_lb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }]
+}
+
+# Create Private Security Group for WordPress Instance
+module "private_sg" {
+  source       = "../../modules/sg"
+  vpc_id       = module.vpc.vpc_id
+  project_name = var.project_name
+  sg_name      = "private-sg"
+  description  = "Allow SSH from Bastion Host"
+  ingress_rules = [{
+    description              = "SSH from Bastion"
+    from_port                = 22
+    to_port                  = 22
+    protocol                 = "tcp"
+    cidr_blocks              = [local.public_subnet1_cidr]
+    source_security_group_id = module.public_lb_sg.sg_id
+  }]
+  depends_on = [module.public_lb_sg]
 }
 
 # Create Private Security Group for RDS Instance
