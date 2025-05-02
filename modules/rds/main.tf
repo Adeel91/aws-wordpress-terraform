@@ -17,6 +17,7 @@ resource "aws_db_instance" "this" {
     Name = "${var.project_name}-mariadb"
   }
 
+  skip_final_snapshot     = true
   backup_retention_period = 0
 }
 
