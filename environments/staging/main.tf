@@ -143,14 +143,22 @@ module "private_sg" {
   project_name = var.project_name
   sg_name      = "private-sg"
   description  = "Allow SSH from Bastion Host"
-  ingress_rules = [{
-    description              = "SSH from Bastion"
-    from_port                = 22
-    to_port                  = 22
-    protocol                 = "tcp"
-    cidr_blocks              = [local.public_subnet1_cidr]
-    source_security_group_id = module.public_lb_sg.sg_id
-  }]
+  ingress_rules = [
+    {
+      description = "SSH from Bastion"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = [local.public_subnet1_cidr]
+    },
+    {
+      description              = "HTTP from ALB"
+      from_port                = 80
+      to_port                  = 80
+      protocol                 = "tcp"
+      source_security_group_id = module.public_lb_sg.sg_id
+    }
+  ]
   depends_on = [module.public_lb_sg]
 }
 
