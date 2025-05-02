@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "static_website" {
-  bucket = var.bucket_name
+  bucket              = var.bucket_name
+  object_lock_enabled = false
 
   tags = {
     Name = "${var.project_name}-bucket"
