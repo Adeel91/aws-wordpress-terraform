@@ -12,10 +12,6 @@ DB_HOST="${DB_HOST}"
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "$(date) - Starting WordPress installation"
 
-# Exit immediately on error and log all commands
-set -e
-trap 'echo "$(date) - ERROR at line $LINENO"; exit 1' ERR
-
 # Update system packages
 echo "Updating system packages..."
 sudo yum update -y

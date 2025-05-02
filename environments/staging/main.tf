@@ -1,5 +1,15 @@
+# Get the latest Amazon Linux 2 AMI
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
 locals {
-  aws_ami       = "ami-05572e392e80aee89" # Amazon Linux 2023 AMI ID
+  aws_ami       = data.aws_ami.amazon_linux_2.id
   pem_key       = "vockey"
   instance_type = "t2.micro"
 
@@ -232,4 +242,10 @@ module "asg" {
   desired_capacity = 2
 
   depends_on = [module.alb]
+}
+
+module "s3_static_website" {
+  source       = "../../modules/s3"
+  project_name = var.project_name
+  bucket_name  = "${var.project_name}-static-site"
 }
