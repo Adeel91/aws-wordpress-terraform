@@ -1,16 +1,22 @@
 #!/bin/bash
 
-# Configuration Variables
-WEB_ROOT="/var/www/html"
-LOG_FILE="/var/log/wordpress-setup.log"
+# Database connections variables
 DB_NAME="${DB_NAME}"
 DB_USER="${DB_USER}"
 DB_PASS="${DB_PASS}"
-DB_HOST="${DB_HOST}"
+DB_HOST=$(echo "${DB_HOST}" | sed 's/:3306//')
+
+# WordPress directory
+WEB_ROOT="/var/www/html"
+LOG_FILE="/var/log/wordpress-setup.log"
 
 # Initialize logging
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "$(date) - Starting WordPress installation"
+
+# Exit immediately on error and log all commands
+set -e
+trap 'echo "$(date) - ERROR at line $LINENO"; exit 1' ERR
 
 # Update system packages
 echo "Updating system packages..."
