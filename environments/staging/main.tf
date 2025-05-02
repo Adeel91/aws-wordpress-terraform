@@ -27,9 +27,9 @@ locals {
 }
 
 # Create random suffix hex
-resource "random_id" "bucket_suffix" {
-  byte_length = 4
-}
+# resource "random_id" "bucket_suffix" {
+#   byte_length = 4
+# }
 
 # Passing project specific details for VPC
 module "vpc" {
@@ -262,8 +262,8 @@ module "asg" {
 }
 
 # Create S3 Bucket
-module "s3_static_website" {
-  source       = "../../modules/s3"
-  project_name = var.project_name
-  bucket_name  = "${var.project_name}-static-site-${random_id.bucket_suffix.hex}"
-}
+# module "s3_static_website" {
+#   source       = "../../modules/s3"
+#   project_name = var.project_name
+#   bucket_name  = "${var.project_name}-static-site-${random_id.bucket_suffix.hex}"
+# }
