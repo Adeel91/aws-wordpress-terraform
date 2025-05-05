@@ -1,0 +1,4 @@
+# Run a following query on an EC2 instance after ssh into using bastion host
+# in order to test rds CPU-intensive performance and trigger alarm
+
+SELECT BENCHMARK(100000000, ENCODE('hello', 'world'));

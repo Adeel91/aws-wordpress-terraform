@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Create .sh file and paste this code and make the file executable 
+# by executing this command chmod +x stress_asg_cpu.sh
+
+# Stress tests CPU on an EC2 instance to trigger ASG scaling
+# Usage: Run via SSH on any ASG instance (use bastion if in private subnet).
+
+# Install stress tool (Amazon Linux 2)
+sudo amazon-linux-extras install epel -y
+sudo yum install -y stress
+
+# Start CPU stress (4 cores, 5 minutes)
+echo "Starting CPU stress test (4 cores, 5 minutes)..."
+stress --cpu 4 --timeout 300s
+
+echo "Stress test complete. Check CloudWatch for CPU alarms!"

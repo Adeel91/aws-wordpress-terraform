@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "alerts" {
-  name = "wordpress-alerts-topic"
+  name = "${var.project_name}-alerts-topic"
 }
 
 resource "aws_sns_topic_subscription" "email_alert" {
