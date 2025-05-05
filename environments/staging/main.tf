@@ -24,6 +24,8 @@ locals {
   db_name     = "${var.project_name}db"
   db_username = "admin"
   db_password = "admin12345"
+
+  email = "muhammad_adeel91@yahoo.com"
 }
 
 # Passing project specific details for VPC
@@ -254,4 +256,19 @@ module "asg" {
   desired_capacity = 2
 
   depends_on = [module.alb]
+}
+
+module "sns" {
+  source          = "../../modules/sns"
+  notification_email = local.email
+}
+
+module "cloudwatch" {
+  source       = "../../modules/cloudwatch"
+  project_name  = var.project_name
+  sns_topic_arn = module.sns.sns_topic_arn
+  asg_name     = module.asg.asg_name
+  rds_id       = module.rds.rds_instance_id
+
+  depends_on = [ module.sns ]
 }
