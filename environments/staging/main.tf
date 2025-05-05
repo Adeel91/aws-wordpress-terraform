@@ -259,16 +259,17 @@ module "asg" {
 }
 
 module "sns" {
-  source          = "../../modules/sns"
+  source             = "../../modules/sns"
+  project_name       = var.project_name
   notification_email = local.email
 }
 
 module "cloudwatch" {
-  source       = "../../modules/cloudwatch"
+  source        = "../../modules/cloudwatch"
   project_name  = var.project_name
   sns_topic_arn = module.sns.sns_topic_arn
-  asg_name     = module.asg.asg_name
-  rds_id       = module.rds.rds_instance_id
+  asg_name      = module.asg.asg_name
+  rds_id        = module.rds.rds_instance_id
 
-  depends_on = [ module.sns ]
+  depends_on = [module.sns]
 }
