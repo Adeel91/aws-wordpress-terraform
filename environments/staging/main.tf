@@ -25,7 +25,7 @@ locals {
   db_username = "admin"
   db_password = "admin12345"
 
-  email = "muhammad_adeel91@yahoo.com"
+  email = "91adeel91@gmail.com"
 }
 
 # Passing project specific details for VPC
@@ -241,6 +241,7 @@ module "asg" {
   db_username  = local.db_username
   db_password  = local.db_password
   rds_endpoint = module.rds.rds_instance_endpoint
+  admin_email  = local.email
 
   private_sg_id = module.private_sg.sg_id
 

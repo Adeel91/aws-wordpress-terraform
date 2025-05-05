@@ -42,17 +42,22 @@ variable "desired_capacity" {
 }
 
 variable "db_name" {
-  description = "RDS Database endpoint"
+  description = "RDS/WordPress Database name"
   type        = string
 }
 
 variable "db_username" {
-  description = "RDS Database endpoint"
+  description = "RDS/WordPress Database username"
   type        = string
 }
 
 variable "db_password" {
-  description = "RDS Database endpoint"
+  description = "RDS/WordPress Database password"
+  type        = string
+}
+
+variable "admin_email" {
+  description = "WordPress admin email"
   type        = string
 }
 

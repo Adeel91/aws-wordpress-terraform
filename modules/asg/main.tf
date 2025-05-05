@@ -14,6 +14,7 @@ resource "aws_launch_template" "ec2_launch_template" {
     DB_NAME = var.db_name != "" ? var.db_name : "db"
     DB_USER = var.db_username != "" ? var.db_username : "admin"
     DB_PASS = var.db_password != "" ? var.db_password : "admin123"
+    ADMIN_EMAIL = var.admin_email != "" ? var.admin_email : "test@example.com"
   }))
 
   tag_specifications {
