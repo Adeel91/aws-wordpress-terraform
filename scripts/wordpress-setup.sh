@@ -17,7 +17,7 @@ LOG_FILE="/var/log/wordpress-setup.log"
 # -----------------------
 # Logging Setup
 # -----------------------
-exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(sudo tee -a "$LOG_FILE") 2>&1
 echo "$(date) - Starting WordPress installation"
 set -e
 trap 'echo "$(date) - ERROR at line $LINENO"; exit 1' ERR
@@ -79,7 +79,7 @@ EOL
 # Bypass Setup Wizard
 # -----------------------
 echo "Bypassing WordPress installation wizard..."
-sudo -u apache php <<EOPHP
+sudo php <<EOPHP
 <?php
 define('WP_INSTALLING', true);
 require_once '$WEB_ROOT/wp-load.php';
@@ -118,7 +118,7 @@ sudo systemctl restart php-fpm httpd
 echo "Verifying Apache is responding..."
 curl -Is http://localhost | head -1 | grep -q "200 OK" || { echo "Apache not responding"; exit 1; }
 
-sudo -u apache php -r "require '$WEB_ROOT/wp-config.php'; echo 'DB connection: ' . (defined('DB_NAME') ? 'OK' : 'FAILED') . PHP_EOL;" | tee -a "$LOG_FILE"
+sudo php -r "require '$WEB_ROOT/wp-config.php'; echo 'DB connection: ' . (defined('DB_NAME') ? 'OK' : 'FAILED') . PHP_EOL;" | sudo tee -a "$LOG_FILE"
 
 echo "$(date) - ✅ WordPress core installation completed"
 
@@ -126,7 +126,7 @@ echo "$(date) - ✅ WordPress core installation completed"
 # Extra Setup Script
 # -----------------------
 echo "Creating wp-extra-setup.php..."
-cat << 'EOF' > "$WEB_ROOT/wp-extra-setup.php"
+sudo cat << 'EOF' > "$WEB_ROOT/wp-extra-setup.php"
 <?php
 define('WP_USE_THEMES', false);
 define('WP_ADMIN', true);
@@ -225,7 +225,7 @@ EOF
 
 # Run and remove the extra setup script
 echo "Executing wp-extra-setup.php..."
-sudo -u apache php "$WEB_ROOT/wp-extra-setup.php" >> /var/log/wp-extra-setup.log 2>&1
-rm -f "$WEB_ROOT/wp-extra-setup.php"
+sudo php "$WEB_ROOT/wp-extra-setup.php" >> /var/log/wp-extra-setup.log 2>&1
+sudo rm -f "$WEB_ROOT/wp-extra-setup.php"
 
 echo "$(date) - 🎉 WordPress extended setup completed successfully!"
