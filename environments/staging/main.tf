@@ -241,6 +241,7 @@ module "asg" {
   db_username  = local.db_username
   db_password  = local.db_password
   rds_endpoint = module.rds.rds_instance_endpoint
+  alb_dns_url  = module.alb.alb_dns_name
   admin_email  = local.email
 
   private_sg_id = module.private_sg.sg_id

@@ -10,10 +10,11 @@ resource "aws_launch_template" "ec2_launch_template" {
   }
 
   user_data = base64encode(templatefile("${path.root}/scripts/wordpress-setup.sh", {
-    DB_HOST = var.rds_endpoint != "" ? var.rds_endpoint : "localhost"
-    DB_NAME = var.db_name != "" ? var.db_name : "db"
-    DB_USER = var.db_username != "" ? var.db_username : "admin"
-    DB_PASS = var.db_password != "" ? var.db_password : "admin123"
+    DB_HOST     = var.rds_endpoint != "" ? var.rds_endpoint : "localhost"
+    DB_NAME     = var.db_name != "" ? var.db_name : "db"
+    DB_USER     = var.db_username != "" ? var.db_username : "admin"
+    DB_PASS     = var.db_password != "" ? var.db_password : "admin123"
+    WEB_URL     = var.alb_dns_url != "" ? var.alb_dns_url : "http://localhost"
     ADMIN_EMAIL = var.admin_email != "" ? var.admin_email : "test@example.com"
   }))
 

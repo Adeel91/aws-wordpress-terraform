@@ -65,3 +65,8 @@ variable "rds_endpoint" {
   description = "RDS Database endpoint"
   type        = string
 }
+
+variable "alb_dns_url" {
+  description = "ALB URL"
+  type        = string
+}

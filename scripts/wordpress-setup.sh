@@ -8,6 +8,8 @@ DB_USER="${DB_USER}"
 DB_PASS="${DB_PASS}"
 DB_HOST=$(echo "${DB_HOST}" | sed 's/:3306//')
 ADMIN_EMAIL="${ADMIN_EMAIL}"
+WEB_HOST="${WEB_URL}"
+
 WEB_ROOT="/var/www/html"
 LOG_FILE="/var/log/wordpress-setup.log"
 
@@ -91,8 +93,8 @@ wp_install(
     '$DB_PASS'
 );
 
-update_option('siteurl', 'http://$DB_HOST');
-update_option('home', 'http://$DB_HOST');
+update_option('siteurl', 'http://$WEB_HOST');
+update_option('home', 'http://$WEB_HOST');
 delete_transient('_wp_initial_setup_complete');
 EOPHP
 
