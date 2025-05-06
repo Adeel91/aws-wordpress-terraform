@@ -79,7 +79,7 @@ EOL
 # Bypass Setup Wizard
 # -----------------------
 echo "Bypassing WordPress installation wizard..."
-sudo php <<EOPHP
+sudo -u apache php <<EOPHP
 <?php
 define('WP_INSTALLING', true);
 require_once '$WEB_ROOT/wp-load.php';
@@ -118,7 +118,7 @@ sudo systemctl restart php-fpm httpd
 echo "Verifying Apache is responding..."
 curl -Is http://localhost | head -1 | grep -q "200 OK" || { echo "Apache not responding"; exit 1; }
 
-sudo php -r "require '$WEB_ROOT/wp-config.php'; echo 'DB connection: ' . (defined('DB_NAME') ? 'OK' : 'FAILED') . PHP_EOL;" | sudo tee -a "$LOG_FILE"
+sudo -u apache php -r "require '$WEB_ROOT/wp-config.php'; echo 'DB connection: ' . (defined('DB_NAME') ? 'OK' : 'FAILED') . PHP_EOL;" | sudo tee -a "$LOG_FILE"
 
 echo "$(date) - ✅ WordPress core installation completed"
 
@@ -126,13 +126,13 @@ echo "$(date) - ✅ WordPress core installation completed"
 # Extra Setup Script
 # -----------------------
 echo "Creating wp-extra-setup.php..."
-sudo cat << 'EOF' > "$WEB_ROOT/wp-extra-setup.php"
+sudo tee "$WEB_ROOT/wp-extra-setup.php" > /dev/null <<'PHP'
 <?php
 define('WP_USE_THEMES', false);
 define('WP_ADMIN', true);
 define('DOING_AJAX', true);
 
-require_once '/var/www/html/wp-load.php';
+require_once dirname(__FILE__) . '/wp-load.php';
 require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 require_once ABSPATH . 'wp-admin/includes/theme.php';
 require_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -141,17 +141,35 @@ require_once ABSPATH . 'wp-admin/includes/file.php';
 global $wp_filesystem;
 WP_Filesystem();
 
-// Install and activate Astra theme
+// Step 1: Install Astra theme if not present
+echo "Installing Astra theme...\n";
 $theme = 'astra';
 if (!wp_get_theme($theme)->exists()) {
     $theme_url = 'https://downloads.wordpress.org/theme/astra.latest-stable.zip';
     include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
     $upgrader = new Theme_Upgrader();
     $upgrader->install($theme_url);
+    echo "✅ Astra theme installed.\n";
+} else {
+    echo "Astra theme already installed.\n";
 }
-switch_theme($theme);
 
-// Install and activate WooCommerce
+// Step 2: Clean theme cache
+echo "Cleaning theme cache...\n";
+wp_clean_themes_cache();
+unset($GLOBALS['wp_themes']);
+
+// Step 3: Activate Astra theme
+if (wp_get_theme($theme)->exists()) {
+    switch_theme($theme);
+    echo "✅ Astra theme activated.\n";
+} else {
+    echo "❌ Failed to activate Astra theme. Aborting.\n";
+    exit(1);
+}
+
+// Step 4: Install and activate WooCommerce plugin
+echo "Installing WooCommerce...\n";
 $plugin_slug = 'woocommerce';
 $plugin_file = 'woocommerce/woocommerce.php';
 if (!function_exists('is_plugin_active')) {
@@ -162,45 +180,23 @@ if (!is_plugin_active($plugin_file)) {
     $upgrader = new Plugin_Upgrader();
     $upgrader->install($plugin_url);
     activate_plugin($plugin_file);
+    echo "✅ WooCommerce plugin installed and activated.\n";
+} else {
+    echo "WooCommerce is already activated.\n";
 }
 
-// Ensure WooCommerce classes are loaded
-if (!class_exists('WooCommerce')) {
-    include_once WP_PLUGIN_DIR . '/woocommerce/woocommerce.php';
-}
-
-// Allow WooCommerce to initialize all required options
-if (class_exists('WooCommerce')) {
-    WC()->init();
-
-    // Set defaults
-    update_option('woocommerce_store_address', '123 Sample St');
-    update_option('woocommerce_store_city', 'Sampleville');
-    update_option('woocommerce_store_postcode', '90210');
-    update_option('woocommerce_store_country', 'US');
-    update_option('woocommerce_store_state', 'CA');
-
-    // Bypass setup wizard
-    update_option('woocommerce_admin_activation_timestamp', time());
-    update_option('woocommerce_setup_activated', true);
-    delete_option('wc_onboarding_profile');
-
-    // Create required WooCommerce pages
-    if (function_exists('wc_create_pages')) {
-        wc_create_pages();
-    }
-}
-
-// Import real sample WooCommerce products with images
+// Step 5: Import WooCommerce sample products
+echo "Importing sample WooCommerce products...\n";
 if (class_exists('WC_Product_CSV_Importer_Controller')) {
     include_once ABSPATH . 'wp-admin/includes/file.php';
     include_once ABSPATH . 'wp-admin/includes/media.php';
     include_once ABSPATH . 'wp-admin/includes/image.php';
 
-    $csv_url = 'https://raw.githubusercontent.com/woocommerce/woocommerce/master/sample-data/sample_products.csv';
+    $csv_url = 'https://diviengine.com/downloads/Divi-Engine-WooCommerce-Sample-Products.csv';
     $csv_file = download_url($csv_url);
-
-    if (!is_wp_error($csv_file)) {
+    if (is_wp_error($csv_file)) {
+        echo "❌ Failed to download sample CSV\n";
+    } else {
         include_once WP_PLUGIN_DIR . '/woocommerce/includes/import/class-wc-product-csv-importer.php';
         $importer = new WC_Product_CSV_Importer($csv_file, [
             'map_fields' => true,
@@ -210,22 +206,21 @@ if (class_exists('WC_Product_CSV_Importer_Controller')) {
         $results = $importer->import();
         echo "✅ Imported {$results['imported']} sample products.\n";
         unlink($csv_file);
-    } else {
-        echo "❌ Failed to download sample CSV\n";
     }
 }
 
-// Set pretty permalinks
-global $wp_rewrite;
-$wp_rewrite->set_permalink_structure('/%postname%/');
-$wp_rewrite->flush_rules();
+echo "✅ Extra WordPress setup completed.\n";
+PHP
 
-echo "✅ Extra WordPress setup (theme + WooCommerce + products + permalinks) completed.\n";
-EOF
+# Ensure wp-extra-setup.php is readable by Apache
+sudo chmod 644 "$WEB_ROOT/wp-extra-setup.php"
+sudo chown apache:apache "$WEB_ROOT/wp-extra-setup.php"
 
 # Run and remove the extra setup script
 echo "Executing wp-extra-setup.php..."
-sudo php "$WEB_ROOT/wp-extra-setup.php" >> /var/log/wp-extra-setup.log 2>&1
+sudo -u apache php "$WEB_ROOT/wp-extra-setup.php" 2>&1 | tee -a /var/log/wp-extra-setup.log
+
+# Remove the extra setup script after execution
 sudo rm -f "$WEB_ROOT/wp-extra-setup.php"
 
 echo "$(date) - 🎉 WordPress extended setup completed successfully!"
