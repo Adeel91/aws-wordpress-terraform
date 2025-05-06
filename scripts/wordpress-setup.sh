@@ -9,6 +9,7 @@ DB_PASS="${DB_PASS}"
 DB_HOST=$(echo "${DB_HOST}" | sed 's/:3306//')
 ADMIN_EMAIL="${ADMIN_EMAIL}"
 WEB_HOST="${WEB_URL}"
+SITE_NAME="${SITE_NAME}"
 
 WEB_ROOT="/var/www/html"
 LOG_FILE="/var/log/wordpress-setup.log"
@@ -85,7 +86,7 @@ require_once '$WEB_ROOT/wp-load.php';
 require_once '$WEB_ROOT/wp-admin/includes/upgrade.php';
 
 wp_install(
-    'My WordPress Site',
+    '$SITE_NAME',
     '$DB_USER',
     '$ADMIN_EMAIL',
     true,

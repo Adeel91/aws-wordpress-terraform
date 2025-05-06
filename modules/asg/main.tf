@@ -16,6 +16,7 @@ resource "aws_launch_template" "ec2_launch_template" {
     DB_PASS     = var.db_password != "" ? var.db_password : "admin123"
     WEB_URL     = var.alb_dns_url != "" ? var.alb_dns_url : "http://localhost"
     ADMIN_EMAIL = var.admin_email != "" ? var.admin_email : "test@example.com"
+    SITE_NAME   = "WPSTACK"
   }))
 
   tag_specifications {
