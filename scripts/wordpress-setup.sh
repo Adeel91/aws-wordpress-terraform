@@ -161,6 +161,11 @@ if (!is_plugin_active($plugin_file)) {
     $upgrader = new Plugin_Upgrader();
     $upgrader->install($plugin_url);
     activate_plugin($plugin_file);
+
+    // Bypass WooCommerce setup wizard
+    update_option('woocommerce_admin_activation_timestamp', time());
+    update_option('woocommerce_setup_activated', true);
+    delete_option('wc_onboarding_profile');
 }
 
 // Ensure WooCommerce classes are loaded
@@ -168,21 +173,28 @@ if (!class_exists('WooCommerce')) {
     include_once WP_PLUGIN_DIR . '/woocommerce/woocommerce.php';
 }
 
-// Add sample products
-if (class_exists('WC_Product_Simple')) {
-    for ($i = 1; $i <= 3; $i++) {
-        $post_id = wp_insert_post([
-            'post_title'   => "Sample Product $i",
-            'post_content' => "This is the description for product $i.",
-            'post_status'  => 'publish',
-            'post_type'    => 'product',
-        ]);
+// Import real sample WooCommerce products with images
+if (class_exists('WC_Product_CSV_Importer_Controller')) {
+    include_once ABSPATH . 'wp-admin/includes/file.php';
+    include_once ABSPATH . 'wp-admin/includes/media.php';
+    include_once ABSPATH . 'wp-admin/includes/image.php';
 
-        if ($post_id) {
-            $product = new WC_Product_Simple($post_id);
-            $product->set_regular_price('19.99');
-            $product->save();
-        }
+    // Download sample product CSV
+    $csv_url = 'https://raw.githubusercontent.com/woocommerce/woocommerce/master/sample-data/sample_products.csv';
+    $csv_file = download_url($csv_url);
+    if (is_wp_error($csv_file)) {
+        echo "❌ Failed to download sample CSV\n";
+    } else {
+        // Import using built-in WooCommerce CSV importer
+        include_once WP_PLUGIN_DIR . '/woocommerce/includes/import/class-wc-product-csv-importer.php';
+        $importer = new WC_Product_CSV_Importer($csv_file, [
+            'map_fields' => true,
+            'parse' => true,
+            'update_existing' => true,
+        ]);
+        $results = $importer->import();
+        echo "✅ Imported {$results['imported']} sample products.\n";
+        unlink($csv_file);
     }
 }
 echo "✅ Extra WordPress setup (theme + WooCommerce + products) completed.\n";
