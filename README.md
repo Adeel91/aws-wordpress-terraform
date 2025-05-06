@@ -2,38 +2,50 @@
   <img src="logo.png" alt="Project Logo" style="background-color:white; padding: 10px; border-radius: 8px;" />
 </p>
 
+# 🚀 Automated WordPress Deployment on AWS using Terraform
 
-# 🚀 Automated WordPress Setup on AWS with Terraform
-
-This project sets up the infrastructure needed to deploy a WordPress website on AWS using Terraform. It provisions the required resources like VPC, subnets, EC2 instances, security groups, and an Application Load Balancer (ALB). The goal is to provide a scalable, secure, and cost-efficient environment to run WordPress.
+This project automates the deployment of a **highly available, secure, and scalable** WordPress environment on AWS using Terraform. It provisions essential cloud infrastructure including **VPC**, **subnets**, **EC2 instances**, **RDS**, **ALB**, **Auto Scaling**, **CloudWatch**, and **SNS**.
 
 [![WordPress on AWS with Terraform](https://img.shields.io/badge/🚀_WordPress-AWS_+_Terraform-FF6C37?style=for-the-badge&logo=wordpress&logoColor=white&labelColor=21759B&color=FF9900)](https://github.com/Adeel91/aws-wordpress-terraform)
 
 ---
 
-## 🛠️ Modules Used (not finalized yet)
-
-The following Terraform modules are used in this project:
+## 🧱 Terraform Modules Used
 
 ### 1. **VPC Module** 🌍
-- **What it does**: Creates a Virtual Private Cloud (VPC) with public and private subnets across **2 Availability Zones (AZs)**.
-- **Purpose**: Isolate resources and provide network security.
+- Creates a VPC with **public and private subnets** across **2 Availability Zones**.
+- Configures **Internet Gateway**, **NAT Gateway**, and routing tables.
 
 ### 2. **Security Group Module** 🔐
-- **What it does**: Configures security groups for EC2 instances and other AWS resources.
-- **Purpose**: Defines rules to ensure secure communication between resources and prevent unauthorized access.
+- Defines security groups for:
+  - Bastion host
+  - WordPress EC2 instances
+  - RDS
+  - ALB
 
 ### 3. **EC2 Module** 💻
-- **What it does**: Launches EC2 instances for WordPress and a Bastion Host.
-- **Purpose**: Deploys WordPress instances in private subnets and a Bastion Host in the public subnet for SSH access.
+- Deploys:
+  - A **Bastion Host** in a public subnet for SSH access.
+  - **WordPress instances** in private subnets using launch templates and Auto Scaling groups.
 
-### 4. **ALB (Application Load Balancer) Module** ⚖️
-- **What it does**: Sets up an ALB to balance incoming HTTP/HTTPS traffic across WordPress instances.
-- **Purpose**: Distribute traffic evenly and ensure high availability.
+### 4. **ALB Module** ⚖️
+- Configures an **Application Load Balancer** to distribute incoming traffic across multiple WordPress instances.
 
-### 5. **RDS Module (Coming Soon)** 🗄️
-- **What it does**: Will set up a managed relational database (like MySQL) for WordPress.
-- **Purpose**: Secure storage for WordPress data, with scaling and backup options.
+### 5. **RDS Module** 🗄️
+- Deploys a **managed MySQL database** for WordPress in private subnets.
+- Enables automated backups, multi-AZ failover, and enhanced security.
+
+### 6. **Auto Scaling Module** 📈
+- Automatically adjusts the number of WordPress EC2 instances based on traffic.
+- Integrated with CloudWatch alarms.
+
+### 7. **CloudWatch Module** 📊
+- Monitors EC2 instances, RDS, and ALB.
+- Sets up custom metrics and alarms (e.g., CPU usage, disk space).
+
+### 8. **SNS Module** 📬
+- Sends notifications (e.g., CloudWatch alarms) via **email or SMS** using **Amazon SNS topics**.
+
 
 ---
 
@@ -68,6 +80,52 @@ This project creates and configures the following key AWS resources:
 
 ---
 
+## 📁 Project File Structure
+
+```bash
+aws-wordpress-terraform/
+│
+├── environments/
+│   └── staging/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+│
+├── modules/
+│   ├── vpc/
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── ec2/
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── alb/
+│   ├── rds/
+│   ├── ec2/
+│   ├── asg/
+│   ├── sg
+│   ├── cloudwatch/
+│   └── sns/
+│   └── subnet/
+│   └── igw/
+│   └── nat/
+│   └── rtb/
+│
+├── userdata/
+│   └── bastion-setup.sh      
+│   └── wordpress-setup.sh     # Bootstraps WordPress with theme/plugins
+│
+├── .gitignore
+├── main.tf
+├── outputs.tf
+├── variables.tf
+├── provider_aws.tf
+└── README.md
+```
+
+---
+
 ## 📋 How to Use
 
 ### Prerequisites
@@ -81,3 +139,92 @@ This project creates and configures the following key AWS resources:
    ```bash
    git clone https://github.com/yourusername/aws-wordpress-terraform.git
    cd aws-wordpress-terraform
+   ```
+
+2. **Update Terraform variables**:
+  Modify the terraform.tfvars file with your own values
+
+3. **Initialize Terraform**:
+
+    Initialize Terraform on your local machine or use Terraform cloud
+
+    ```bash
+    terraform init
+    ```
+
+4. **Review the execution plan**:
+  
+    Review your terraform plan for deploying
+
+    ```bash
+    terraform plan
+    ```
+
+5. **Apply the configuration**:
+  
+    Apply your configuration using the following command
+
+    ```bash
+    terraform apply
+    ```
+
+6. **Access WordPress**:
+
+  - Once the ALB is created, open the ALB DNS name in your browser.
+  - WordPress should be ready with the Astra theme and WooCommerce plugin configured.
+
+---
+
+## 📦 Features
+
+✅ Fully automated setup with infrastructure-as-code
+
+✅ WordPress EC2 instances behind an ALB
+
+✅ Bastion host for secure SSH access
+
+✅ RDS (MySQL) for database storage
+
+✅ Auto Scaling Group for dynamic scaling
+
+✅ CloudWatch monitoring and alarms
+
+✅ SNS alerts for system notifications
+
+✅ Modular, reusable Terraform structure
+
+---
+
+## 🧪 Testing
+
+✅ Use curl or browser to test the ALB DNS.
+
+✅ SSH into the Bastion host and connect to private instances.
+
+✅ Verify database access and replication (if multi-AZ RDS is enabled).
+
+✅ Simulate load to test Auto Scaling and alarms.
+
+
+---
+
+## 🧹 Cleanup
+
+To destroy all resources:
+
+```bash
+terraform destroy
+````
+
+---
+
+## 🧠 Future Enhancements
+
+✅ HTTPS via ACM + ALB
+
+✅ S3 backend for remote Terraform state
+
+✅ CloudFront + WAF
+
+✅ CI/CD pipeline integration (e.g., GitHub Actions)
+  
