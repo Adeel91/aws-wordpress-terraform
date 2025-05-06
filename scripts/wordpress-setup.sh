@@ -162,16 +162,33 @@ if (!is_plugin_active($plugin_file)) {
     $upgrader = new Plugin_Upgrader();
     $upgrader->install($plugin_url);
     activate_plugin($plugin_file);
-
-    // Bypass WooCommerce setup wizard
-    update_option('woocommerce_admin_activation_timestamp', time());
-    update_option('woocommerce_setup_activated', true);
-    delete_option('wc_onboarding_profile');
 }
 
 // Ensure WooCommerce classes are loaded
 if (!class_exists('WooCommerce')) {
     include_once WP_PLUGIN_DIR . '/woocommerce/woocommerce.php';
+}
+
+// Allow WooCommerce to initialize all required options
+if (class_exists('WooCommerce')) {
+    WC()->init();
+
+    // Set defaults
+    update_option('woocommerce_store_address', '123 Sample St');
+    update_option('woocommerce_store_city', 'Sampleville');
+    update_option('woocommerce_store_postcode', '90210');
+    update_option('woocommerce_store_country', 'US');
+    update_option('woocommerce_store_state', 'CA');
+
+    // Bypass setup wizard
+    update_option('woocommerce_admin_activation_timestamp', time());
+    update_option('woocommerce_setup_activated', true);
+    delete_option('wc_onboarding_profile');
+
+    // Create required WooCommerce pages
+    if (function_exists('wc_create_pages')) {
+        wc_create_pages();
+    }
 }
 
 // Import real sample WooCommerce products with images
@@ -180,13 +197,10 @@ if (class_exists('WC_Product_CSV_Importer_Controller')) {
     include_once ABSPATH . 'wp-admin/includes/media.php';
     include_once ABSPATH . 'wp-admin/includes/image.php';
 
-    // Download sample product CSV
     $csv_url = 'https://raw.githubusercontent.com/woocommerce/woocommerce/master/sample-data/sample_products.csv';
     $csv_file = download_url($csv_url);
-    if (is_wp_error($csv_file)) {
-        echo "❌ Failed to download sample CSV\n";
-    } else {
-        // Import using built-in WooCommerce CSV importer
+
+    if (!is_wp_error($csv_file)) {
         include_once WP_PLUGIN_DIR . '/woocommerce/includes/import/class-wc-product-csv-importer.php';
         $importer = new WC_Product_CSV_Importer($csv_file, [
             'map_fields' => true,
@@ -196,9 +210,17 @@ if (class_exists('WC_Product_CSV_Importer_Controller')) {
         $results = $importer->import();
         echo "✅ Imported {$results['imported']} sample products.\n";
         unlink($csv_file);
+    } else {
+        echo "❌ Failed to download sample CSV\n";
     }
 }
-echo "✅ Extra WordPress setup (theme + WooCommerce + products) completed.\n";
+
+// Set pretty permalinks
+global $wp_rewrite;
+$wp_rewrite->set_permalink_structure('/%postname%/');
+$wp_rewrite->flush_rules();
+
+echo "✅ Extra WordPress setup (theme + WooCommerce + products + permalinks) completed.\n";
 EOF
 
 # Run and remove the extra setup script
