@@ -73,6 +73,23 @@ EOL
 echo "$(date) - ✅ Updated wp-config.php with database information"
 
 # -----------------------
+# Replace localhost:8080 with AWS host in wordpressdb.sql
+# -----------------------
+echo "Replacing 'localhost:8080' with AWS host in the SQL dump file..."
+
+sed -i "s/localhost:8080/$WEB_HOST/g" "$WEB_ROOT/wordpressdb.sql"
+
+echo "$(date) - ✅ Replaced 'localhost:8080' with AWS host in the SQL dump"
+
+# -----------------------
+# Check if the SQL dump file exists
+# -----------------------
+if [ ! -f "$WEB_ROOT/wordpressdb.sql" ]; then
+    echo "$(date) - ERROR: SQL dump file does not exist at $WEB_ROOT/wordpressdb.sql"
+    exit 1
+fi
+
+# -----------------------
 # Import WordPress SQL Dump into RDS
 # -----------------------
 # Only import if 'wp_options' table has fewer than N rows
@@ -80,7 +97,7 @@ ROWS=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -e "SELECT COUNT(*) FROM $
 
 if [[ "$ROWS" -lt 5 ]]; then
   echo "Importing database dump since it appears empty..."
-  mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$WEB_ROOT/wordpressdb.sql"
+  mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" --default-character-set=utf8mb4 "$DB_NAME" < "$WEB_ROOT/wordpressdb.sql"
   echo "$(date) - ✅ Database imported successfully"
 else
   echo "$(date) - ℹ️ Database already populated, skipping import"
