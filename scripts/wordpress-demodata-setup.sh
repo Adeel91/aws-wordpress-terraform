@@ -75,14 +75,15 @@ echo "$(date) - ✅ Updated wp-config.php with database information"
 # -----------------------
 # Import WordPress SQL Dump into RDS
 # -----------------------
-echo "Importing WordPress database into RDS..."
+# Only import if 'wp_options' table has fewer than N rows
+ROWS=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -e "SELECT COUNT(*) FROM ${DB_NAME}.wp_options;" 2>/dev/null | tail -n1)
 
-if [ -f "$WEB_ROOT/wordpressdb.sql" ]; then
+if [[ "$ROWS" -lt 5 ]]; then
+  echo "Importing database dump since it appears empty..."
   mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$WEB_ROOT/wordpressdb.sql"
   echo "$(date) - ✅ Database imported successfully"
 else
-  echo "$(date) - ❌ wordpressdb.sql file not found in $WEB_ROOT"
-  exit 1
+  echo "$(date) - ℹ️ Database already populated, skipping import"
 fi
 
 echo "$(date) - ✅ Complete woocommerce with sample store installed"
