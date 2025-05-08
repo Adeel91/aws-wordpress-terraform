@@ -73,13 +73,13 @@ EOL
 echo "$(date) - ✅ Updated wp-config.php with database information"
 
 # -----------------------
-# Replace localhost:8080 with AWS host in wordpressdb.sql
+# Replace localhost:8000 with AWS host in wordpressdb.sql
 # -----------------------
-echo "Replacing 'localhost:8080' with AWS host in the SQL dump file..."
+echo "Replacing 'localhost:8000' with AWS host in the SQL dump file..."
 
-sed -i "s/localhost:8080/$WEB_HOST/g" "$WEB_ROOT/wordpressdb.sql"
+sed -i "s/localhost:8000/$WEB_HOST/g" "$WEB_ROOT/wordpressdb.sql"
 
-echo "$(date) - ✅ Replaced 'localhost:8080' with AWS host in the SQL dump"
+echo "$(date) - ✅ Replaced 'localhost:8000' with AWS host in the SQL dump"
 
 # -----------------------
 # Check if the SQL dump file exists
