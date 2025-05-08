@@ -51,6 +51,8 @@ This project automates the deployment of a **highly available, secure, and scala
 
 ## 🌍 Infrastructure Overview
 
+![AWS Infrastructure Architecture Diagram](aws-infrastructure-diagram.jpg)
+
 This project creates and configures the following key AWS resources:
 
 - **VPC** 🌐: A custom VPC with **public** and **private** subnets spread across two Availability Zones (AZs).
@@ -62,6 +64,8 @@ This project creates and configures the following key AWS resources:
   - **WordPress Instances** 📝: Deployed in private subnets, ensuring the application is protected from direct access.
 
 - **ALB (Application Load Balancer)** ⚖️: Balances traffic between WordPress instances for high availability and fault tolerance.
+
+- **Autoscaling** 🦥: Scaling wordpress instances horizontally based on the load on machines.
 
 ---
 

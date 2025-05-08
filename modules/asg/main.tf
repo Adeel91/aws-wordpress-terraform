@@ -9,7 +9,7 @@ resource "aws_launch_template" "ec2_launch_template" {
     security_groups             = [var.private_sg_id]
   }
 
-  user_data = base64encode(templatefile("${path.root}/scripts/wordpress-setup.sh", {
+  user_data = base64encode(templatefile("${path.root}/scripts/wordpress-demodata-setup.sh", {
     DB_HOST     = var.rds_endpoint != "" ? var.rds_endpoint : "localhost"
     DB_NAME     = var.db_name != "" ? var.db_name : "db"
     DB_USER     = var.db_username != "" ? var.db_username : "admin"
