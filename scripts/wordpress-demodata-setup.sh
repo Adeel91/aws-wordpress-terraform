@@ -52,6 +52,8 @@ sudo yum install -y git
 echo "Cloning WooCommerce website repository..."
 sudo git clone https://github.com/Adeel91/woocommerce-website "$WEB_ROOT"
 
+echo "$(date) - ✅ Core packages installation completed"
+
 # -----------------------
 # Update wp-config.php with the configuration variables
 # -----------------------
@@ -68,4 +70,19 @@ define( 'WP_DEBUG', false );
 define( 'WP_AUTO_UPDATE_CORE', false );
 EOL
 
-echo "$(date) - ✅ Core packages installation completed"
+echo "$(date) - ✅ Updated wp-config.php with database information"
+
+# -----------------------
+# Import WordPress SQL Dump into RDS
+# -----------------------
+echo "Importing WordPress database into RDS..."
+
+if [ -f "$WEB_ROOT/wordpressdb.sql" ]; then
+  mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$WEB_ROOT/wordpressdb.sql"
+  echo "$(date) - ✅ Database imported successfully"
+else
+  echo "$(date) - ❌ wordpressdb.sql file not found in $WEB_ROOT"
+  exit 1
+fi
+
+echo "$(date) - ✅ Complete woocommerce with sample store installed"
