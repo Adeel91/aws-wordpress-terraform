@@ -71,8 +71,8 @@ sudo cat <<'EOF' | sudo tee "$WEB_ROOT/.htaccess" > /dev/null
 RewriteEngine On
 RewriteBase /
 RewriteRule ^index\.php$ - [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %%{REQUEST_FILENAME} !-f
+RewriteCond %%{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
 # END WordPress
