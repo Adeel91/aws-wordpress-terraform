@@ -44,6 +44,13 @@ echo "Configuring PHP-FPM..."
 sudo systemctl enable --now php-fpm
 
 # -----------------------
+# Configure Apache to allow .htaccess
+# -----------------------
+echo "Updating Apache config to allow .htaccess..."
+sudo sed -i '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
+sudo systemctl restart httpd
+
+# -----------------------
 # Install Git and Clone Repository
 # -----------------------
 echo "Installing Git..."
@@ -51,6 +58,27 @@ sudo yum install -y git
 
 echo "Cloning WooCommerce website repository..."
 sudo git clone https://github.com/Adeel91/woocommerce-website "$WEB_ROOT"
+
+echo "$(date) - ✅ Core packages installation completed"
+
+# -----------------------
+# Create .htaccess for WordPress permalinks
+# -----------------------
+echo "Creating .htaccess file for WordPress..."
+sudo cat <<'EOF' | sudo tee "$WEB_ROOT/.htaccess" > /dev/null
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+EOF
+
+sudo chown apache:apache "$WEB_ROOT/.htaccess"
 
 echo "$(date) - ✅ Core packages installation completed"
 
